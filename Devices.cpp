@@ -13,27 +13,28 @@ public:
         this->numCycles = cycles;
     }
 
+    // Function for processing the data from input ports
     void ProcessDataInput() {
         inputVal1 = *port1;
         inputVal2 = *port2;
     }
 
-    // Pure Virtual Function for performing the device's main function
+    // Function for performing the device's main function
     void PerformFunction() {
         outputVal = inputVal1 + inputVal2;
     }
 
-    // Pure Virtual Function for reacting to the clock signal
+    // Function for reacting to the clock signal
     void OnClockSignal() {
         *outputLatch = outputVal;
     }
 
-    // Pure Virtual Function for reacting to control signals
+    // Function for reacting to control signals
     void OnControlSignal() {
         return;
     }
 
-    // Pure Virtual Function for updating the output latches
+    // Function for updating the output latches
     void UpdateOutputLatches(int** latches) {
         outputLatch = latches[0];
     }
@@ -73,23 +74,23 @@ public:
         inputVal2 = *port2;
     }
 
-    // Pure Virtual Function for performing the device's main function
+    // Function for performing the device's main function
     void PerformFunction() {
         outputVal = inputVal1 * inputVal2;
     }
 
-    // Pure Virtual Function for reacting to the clock signal
+    // Function for reacting to the clock signal
     void OnClockSignal() {
         *outputLatch = outputVal;
     }
 
 
-    // Pure Virtual Function for reacting to control signals
+    // Function for reacting to control signals
     void OnControlSignal() {
         return;
     }
 
-    // Pure Virtual Function for updating the output latches
+    // Function for updating the output latches
     void UpdateOutputLatches(int** latches) {
         outputLatch = latches[0];
     }
@@ -113,7 +114,6 @@ private:
 
 };
 
-
 /**
  * Shifter Device (under construction)
  */
@@ -125,28 +125,28 @@ public:
         this->numCycles = cycles;
     }
 
+    // Function for processing the data from input ports
     void ProcessDataInput() {
         inputVal1 = *port1;
         inputVal2 = *port2;
     }
 
-    // Pure Virtual Function for performing the device's main function
+    // Function for performing the device's main function
     void PerformFunction() {
         outputVal = inputVal1 * inputVal2;
     }
 
-    // Pure Virtual Function for reacting to the clock signal
+    // Function for reacting to the clock signal
     void OnClockSignal() {
         *outputLatch = outputVal;
     }
 
-
-    // Pure Virtual Function for reacting to control signals
+    // Function for reacting to control signals
     void OnControlSignal() {
         return;
     }
 
-    // Pure Virtual Function for updating the output latches
+    // Function for updating the output latches
     void UpdateOutputLatches(int** latches) {
         outputLatch = latches[0];
     }
@@ -189,7 +189,3 @@ int main() {
 
     return 0;
 }
-
-
-int val = 500;
-int newVal = 500 << 4;

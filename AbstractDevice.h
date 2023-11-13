@@ -14,17 +14,6 @@ public:
 
     // Pure Virtual Function for reacting to the clock signal
     virtual void OnClockSignal() = 0;
-
-    // Pure Virtual Function for reacting to control signals
-    virtual void OnControlSignal() = 0;
-
-    // Pure Virtual Function for updating the output latches
-    virtual void UpdateOutputLatches(int** latches) = 0;
-
-    // Function for connecting input ports
-    virtual void ConnectInputPorts(int** ports) {
-        // Implementation for connecting input
-    }
 };
 
 
