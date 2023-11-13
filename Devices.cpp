@@ -133,7 +133,12 @@ public:
 
     // Function for performing the device's main function
     void PerformFunction() {
-        outputVal = inputVal1 * inputVal2;
+        if (shiftDirection == 0) {
+            outputVal = inputVal1 >> inputVal2;
+        }
+        else {
+            outputVal = inputVal1 << inputVal2;
+        }
     }
 
     // Function for reacting to the clock signal
@@ -142,8 +147,8 @@ public:
     }
 
     // Function for reacting to control signals
-    void OnControlSignal() {
-        return;
+    void OnControlSignal(int direction) {
+        shiftDirection = direction;
     }
 
     // Function for updating the output latches
@@ -161,6 +166,7 @@ private:
     int area;
     int power;
     int numCycles;
+    int shiftDirection; // 0 -> shift right, 1 -> shift left
     int* port1;
     int* port2;
     int* outputLatch;
@@ -174,17 +180,24 @@ private:
 int main() {
     std::cout << "Hello, World!" << std::endl;
 
-    int p1 = 3;
-    int p2 = 4;
+    int p1 = 16;
+    int p2 = 2;
     int* ports[] = {&p1, &p2};
     int latch;
     int* latches[] = {&latch};
-    Addr addr(400, 0.5, 1);
-    addr.ConnectInputPorts(ports);
-    addr.UpdateOutputLatches(latches);
-    addr.ProcessDataInput();
-    addr.PerformFunction();
-    addr.OnClockSignal();
+    // Addr addr(400, 0.5, 1);
+    // addr.ConnectInputPorts(ports);
+    // addr.UpdateOutputLatches(latches);
+    // addr.ProcessDataInput();
+    // addr.PerformFunction();
+    // addr.OnClockSignal();
+    Shifter shifter(200, 0.5, 2);
+    shifter.ConnectInputPorts(ports);
+    shifter.UpdateOutputLatches(latches);
+    shifter.OnControlSignal(1);
+    shifter.ProcessDataInput();
+    shifter.PerformFunction();
+    shifter.OnClockSignal();
     std::cout << "result: " << **latches << std::endl;
 
     return 0;
