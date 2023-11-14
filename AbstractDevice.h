@@ -6,9 +6,6 @@ public:
     // Constructors
     // Device() {}
 
-    // Pure Virtual Function for processing the data from input ports
-    virtual void ProcessDataInput() = 0;
-
     // Pure Virtual Function for performing the device's main function
     virtual void PerformFunction() = 0;
 

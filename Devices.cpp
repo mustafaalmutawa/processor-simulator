@@ -338,20 +338,19 @@ public:
         this->numCycles = cycles;
     }
 
-    void ProcessDataInput() {
-        inputVal = *port;
+    void ProcessDataInput(long long val) {
+        value = val;
     }
 
     // Function for performing the device's main function
     void PerformFunction() {
-        outputVal = inputVal;
+        return;
     }
 
     // Function for reacting to the clock signal
     void OnClockSignal() {
-        *outputLatch = outputVal;
+        *outputLatch = value;
     }
-
 
     // Function for reacting to control signals
     void OnControlSignal() {
@@ -372,11 +371,9 @@ private:
     int area;
     int power;
     int numCycles;
-    int value;
+    long long value;
     int* port;
     int* outputLatch;
-    int inputVal;
-    int outputVal;
 
 };
 
