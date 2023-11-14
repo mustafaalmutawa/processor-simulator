@@ -273,6 +273,69 @@ private:
 };
 
 
+/**
+ * Register Device
+ */
+class Register : public Device {
+public:
+    Register(int area, double power, int cycles) {
+        this->area = area;
+        this->power = power;
+        this->numCycles = cycles;
+    }
+
+    void ProcessDataInput() {
+        inputVal = *port;
+    }
+
+    // Function for performing the device's main function
+    void PerformFunction() {
+        outputVal = inputVal;
+    }
+
+    // Function for reacting to the clock signal
+    void OnClockSignal() {
+        *outputLatch = outputVal;
+    }
+
+
+    // Function for reacting to control signals
+    void OnControlSignal() {
+        return;
+    }
+
+    // Function for updating the output latches
+    void UpdateOutputLatches(int** latches) {
+        outputLatch = latches[0];
+    }
+
+    // Function for connecting input ports
+    void ConnectInputPorts(int** ports) {
+        port = ports[0];
+    }
+
+private:
+    int area;
+    int power;
+    int numCycles;
+    int value;
+    int* port;
+    int* outputLatch;
+    int inputVal;
+    int outputVal;
+
+};
+
+
+
+
+class Processor {
+public:
+    Processor() {
+    }
+private:
+};
+
 int main() {
     std::cout << "Hello, World!" << std::endl;
 
@@ -315,3 +378,4 @@ int main() {
 
     return 0;
 }
+
