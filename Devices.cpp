@@ -24,9 +24,6 @@ Instruction decodeInstruction(uint32_t instruction) {
     return result;
 }
 
-
-
-
 /**
  * Adder Device
  */
@@ -139,9 +136,8 @@ private:
 
 };
 
-
 /**
- * Multiplier Device
+ * Divider Device
  */
 class Divider : public Device {
 public:
@@ -331,7 +327,6 @@ private:
 
 };
 
-
 /**
  * Register Device
  */
@@ -385,15 +380,13 @@ private:
 
 };
 
-
-
-
 class Processor {
 public:
     Processor() {
     }
 private:
 };
+
 
 int main() {
     std::cout << "Hello, World!" << std::endl;
@@ -437,4 +430,3 @@ int main() {
 
     return 0;
 }
-
