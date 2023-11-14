@@ -25,6 +25,8 @@ Instruction decodeInstruction(uint32_t instruction) {
 }
 
 
+
+
 /**
  * Adder Device
  */
@@ -137,6 +139,63 @@ private:
 
 };
 
+
+/**
+ * Multiplier Device
+ */
+class Divider : public Device {
+public:
+    Divider(int area, double power, int cycles) {
+        this->area = area;
+        this->power = power;
+        this->numCycles = cycles;
+    }
+
+    void ProcessDataInput() {
+        inputVal1 = *port1;
+        inputVal2 = *port2;
+    }
+
+    // Function for performing the device's main function
+    void PerformFunction() {
+        outputVal = inputVal1 / inputVal2;
+    }
+
+    // Function for reacting to the clock signal
+    void OnClockSignal() {
+        *outputLatch = outputVal;
+    }
+
+
+    // Function for reacting to control signals
+    void OnControlSignal() {
+        return;
+    }
+
+    // Function for updating the output latches
+    void UpdateOutputLatches(int** latches) {
+        outputLatch = latches[0];
+    }
+
+    // Function for connecting input ports
+    void ConnectInputPorts(int** ports) {
+        port1 = ports[0];
+        port2 = ports[1];
+    }
+
+private:
+    int area;
+    int power;
+    int numCycles;
+    int* port1;
+    int* port2;
+    int* outputLatch;
+    int inputVal1;
+    int inputVal2;
+    int outputVal;
+
+};
+
 /**
  * Shifter Device
  */
@@ -196,7 +255,7 @@ private:
     int inputVal1;
     int inputVal2;
     int outputVal;
-    
+
 };
 
 /**
@@ -269,7 +328,7 @@ private:
     int inputVal1;
     int inputVal2;
     int outputVal;
-    
+
 };
 
 
@@ -355,7 +414,7 @@ int main() {
 
     uint32_t encodedInstruction = 0x483000;
     Instruction decoded = decodeInstruction(encodedInstruction);
-    
+
     // Print each field of the decoded instruction
     std::cout << "Opcode: " << decoded.opcode << std::endl;
     std::cout << "Register 1: " << decoded.reg1 << std::endl;
