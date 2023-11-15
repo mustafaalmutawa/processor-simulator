@@ -52,20 +52,22 @@ public:
         this->numCycles = cycles;
     }
 
-    // Function for processing the data from input ports
-    void ProcessDataInput() {
-        inputVal1 = *port1;
-        inputVal2 = *port2;
-    }
+    // // Function for processing the data from input ports
+    // void ProcessDataInput() {
+    //     inputVal1 = *port1;
+    //     inputVal2 = *port2;
+    // }
 
     // Function for performing the device's main function
     void PerformFunction() {
-        outputVal = inputVal1 + inputVal2;
+        std::cout << "port1 value: " << inputPorts[0].getValue() << std::endl;
+        std::cout << "port2 value: " << inputPorts[1].getValue() << std::endl;
+        outputVal = inputPorts[0].getValue() + inputPorts[1].getValue();
     }
 
     // Function for reacting to the clock signal
     void OnClockSignal() {
-        *outputLatch = outputVal;
+        (*outputLatch).setValue(outputVal);
     }
 
     // Function for reacting to control signals
@@ -74,26 +76,27 @@ public:
     }
 
     // Function for updating the output latches
-    void UpdateOutputLatches(int** latches) {
-        outputLatch = latches[0];
+    void connectOutputLatches(Port* latch) {
+        outputLatch = latch;
     }
 
     // Function for connecting input ports
-    void ConnectInputPorts(int** ports) {
-        port1 = ports[0];
-        port2 = ports[1];
+    void ConnectInputPorts(int id, Port* port) {
+        inputPorts[id] = *port;
     }
 
 private:
     int area;
     int power;
     int numCycles;
-    int* port1;
-    int* port2;
-    int* outputLatch;
+    Port inputPorts[2];
+    // int* port1;
+    // int* port2;
+    Port* outputLatch; // the latch is defined with port class because it serves the same functionality
+    // int* outputLatch;
     int inputVal1;
     int inputVal2;
-    int outputVal;
+    long long outputVal;
 
 };
 
@@ -131,7 +134,7 @@ public:
     }
 
     // Function for updating the output latches
-    void UpdateOutputLatches(int** latches) {
+    void connectOutputLatches(int** latches) {
         outputLatch = latches[0];
     }
 
@@ -187,7 +190,7 @@ public:
     }
 
     // Function for updating the output latches
-    void UpdateOutputLatches(int** latches) {
+    void connectOutputLatches(int** latches) {
         outputLatch = latches[0];
     }
 
@@ -249,7 +252,7 @@ public:
     }
 
     // Function for updating the output latches
-    void UpdateOutputLatches(int** latches) {
+    void connectOutputLatches(int** latches) {
         outputLatch = latches[0];
     }
 
@@ -322,7 +325,7 @@ public:
     }
 
     // Function for updating the output latches
-    void UpdateOutputLatches(int** latches) {
+    void connectOutputLatches(int** latches) {
         outputLatch = latches[0];
     }
 
@@ -377,7 +380,7 @@ public:
     }
 
     // Function for updating the output latches
-    void UpdateOutputLatches(int** latches) {
+    void connectOutputLatches(int** latches) {
         outputLatch = latches[0];
     }
 
@@ -431,7 +434,7 @@ public:
     }
 
     // Function for updating the output latches
-    void UpdateOutputLatches(int** latches) {
+    void connectOutputLatches(int** latches) {
         outputLatch = latches[0];
     }
 
@@ -465,14 +468,14 @@ private:
 int main() {
     std::cout << "Hello, World!" << std::endl;
 
-    int p1 = 16;
-    int p2 = 2;
-    int* ports[] = {&p1, &p2};
-    int latch;
-    int* latches[] = {&latch};
+    // int p1 = 16;
+    // int p2 = 2;
+    // int* ports[] = {&p1, &p2};
+    // int latch;
+    // int* latches[] = {&latch};
     // Shifter shifter(200, 0.5, 2);
     // shifter.ConnectInputPorts(ports);
-    // shifter.UpdateOutputLatches(latches);
+    // shifter.connectOutputLatches(latches);
     // shifter.OnControlSignal(1);
     // shifter.ProcessDataInput();
     // shifter.PerformFunction();
@@ -489,18 +492,24 @@ int main() {
     std::cout << "Register 3: " << decoded.reg3 << std::endl;
     std::cout << "Literal: " << decoded.literal << std::endl;
 
-    p1 = decoded.reg2;
-    p2 = decoded.reg3;
-    ports[0] = &p1;
-    ports[1] = &p2;
-    latches[0] = &latch;
+    int p1 = decoded.reg2;
+    int p2 = decoded.reg3;
+    Port port1;
+    Port port2;
+    port1.setValue(decoded.reg2);
+    port2.setValue(decoded.reg3);
+    // ports[0] = &p1;
+    // ports[1] = &p2;
+    // latches[0] = &latch;
+    Port latch;
     Addr addr(400, 0.5, 1);
-    addr.ConnectInputPorts(ports);
-    addr.UpdateOutputLatches(latches);
-    addr.ProcessDataInput();
+    addr.ConnectInputPorts(0, &port1);
+    addr.ConnectInputPorts(1, &port2);
+    addr.connectOutputLatches(&latch);
+    // addr.ProcessDataInput();
     addr.PerformFunction();
     addr.OnClockSignal();
-    std::cout << "result: " << **latches << std::endl;
+    std::cout << "result: " << latch.getValue() << std::endl;
 
     return 0;
 }
