@@ -25,6 +25,23 @@ Instruction decodeInstruction(uint32_t instruction) {
 }
 
 /**
+ * A simple port class with a setter and getter.
+ */
+class Port {
+public:
+    void setValue(long long val) {
+        value = val;
+    }
+
+    long long getValue() {
+        return value;
+    }
+
+private:
+    long long value;
+};
+
+/**
  * Adder Device
  */
 class Addr : public Device {
@@ -109,6 +126,7 @@ public:
 
     // Function for reacting to control signals
     void OnControlSignal() {
+        PerformFunction();
         return;
     }
 
@@ -227,6 +245,7 @@ public:
     // Function for reacting to control signals
     void OnControlSignal(int signal) {
         shiftDirection = signal;
+        PerformFunction();
     }
 
     // Function for updating the output latches
@@ -332,7 +351,7 @@ private:
  */
 class Register : public Device {
 public:
-    Register(int area, double power, int cycles) {
+    Register(double area, double power, double cycles) {
         this->area = area;
         this->power = power;
         this->numCycles = cycles;
@@ -353,8 +372,62 @@ public:
     }
 
     // Function for reacting to control signals
-    void OnControlSignal() {
+    long long OnControlSignal() {
+        return value;
+    }
+
+    // Function for updating the output latches
+    void UpdateOutputLatches(int** latches) {
+        outputLatch = latches[0];
+    }
+
+    // Function for connecting input ports
+    void ConnectInputPorts(int** ports) {
+        port = ports[0];
+    }
+
+private:
+    double area;
+    double power;
+    double numCycles;
+    long long value;
+    int* port;
+    int* outputLatch;
+
+};
+
+/**
+ * Register File
+ */
+class RegisterFile : public Device {
+public:
+    RegisterFile(int area, double power, int cycles) {
+        this->area = area;
+        this->power = power;
+        this->numCycles = cycles;
+        for (int i = 0; i < 32; i++) {
+            registers.push_back(Register(200, 0.05, 0.5));
+        }
+    }
+
+    void ProcessDataInput(int addr, long long val) {
+        registers[addr].ProcessDataInput(val);
+    }
+
+    // Function for performing the device's main function
+    void PerformFunction() {
         return;
+    }
+
+    // Function for reacting to the clock signal
+    void OnClockSignal() {
+        *outputLatch = value;
+    }
+
+    // Function for reacting to control signals
+    void OnControlSignal(int addr1, int addr2) {
+        value1 = registers[addr1].OnControlSignal();
+        value2 = registers[addr1].OnControlSignal();
     }
 
     // Function for updating the output latches
@@ -371,9 +444,13 @@ private:
     int area;
     int power;
     int numCycles;
+    std::vector<Register> registers;
     long long value;
     int* port;
     int* outputLatch;
+    int* outputLatch2;
+    long long value1;
+    long long value2;
 
 };
 
