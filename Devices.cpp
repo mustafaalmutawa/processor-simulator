@@ -46,23 +46,17 @@ private:
  */
 class Addr : public Device {
 public:
-    Addr(int area, double power, int cycles) {
+    Addr(double area, double power, double cycles) {
         this->area = area;
         this->power = power;
         this->numCycles = cycles;
     }
 
-    // // Function for processing the data from input ports
-    // void ProcessDataInput() {
-    //     inputVal1 = *port1;
-    //     inputVal2 = *port2;
-    // }
-
     // Function for performing the device's main function
     void PerformFunction() {
-        std::cout << "port1 value: " << inputPorts[0].getValue() << std::endl;
-        std::cout << "port2 value: " << inputPorts[1].getValue() << std::endl;
-        outputVal = inputPorts[0].getValue() + inputPorts[1].getValue();
+        std::cout << "port1 value: " << inputPorts[0]->getValue() << std::endl;
+        std::cout << "port2 value: " << inputPorts[1]->getValue() << std::endl;
+        outputVal = inputPorts[0]->getValue() + inputPorts[1]->getValue();
     }
 
     // Function for reacting to the clock signal
@@ -75,27 +69,22 @@ public:
         return;
     }
 
-    // Function for updating the output latches
+    // Function for connecting the output latches
     void connectOutputLatches(Port* latch) {
         outputLatch = latch;
     }
 
     // Function for connecting input ports
     void ConnectInputPorts(int id, Port* port) {
-        inputPorts[id] = *port;
+        inputPorts[id] = port;
     }
 
 private:
-    int area;
-    int power;
-    int numCycles;
-    Port inputPorts[2];
-    // int* port1;
-    // int* port2;
+    double area;
+    double power;
+    double numCycles;
+    Port* inputPorts[2];
     Port* outputLatch; // the latch is defined with port class because it serves the same functionality
-    // int* outputLatch;
-    int inputVal1;
-    int inputVal2;
     long long outputVal;
 
 };
@@ -105,7 +94,7 @@ private:
  */
 class Multiplier : public Device {
 public:
-    Multiplier(int area, double power, int cycles) {
+    Multiplier(double area, double power, double cycles) {
         this->area = area;
         this->power = power;
         this->numCycles = cycles;
@@ -133,7 +122,7 @@ public:
         return;
     }
 
-    // Function for updating the output latches
+    // Function for connecting the output latches
     void connectOutputLatches(int** latches) {
         outputLatch = latches[0];
     }
@@ -145,9 +134,9 @@ public:
     }
 
 private:
-    int area;
-    int power;
-    int numCycles;
+    double area;
+    double power;
+    double numCycles;
     int* port1;
     int* port2;
     int* outputLatch;
@@ -218,7 +207,7 @@ private:
  */
 class Shifter : public Device {
 public:
-    Shifter(int area, double power, int cycles) {
+    Shifter(double area, double power, double cycles) {
         this->area = area;
         this->power = power;
         this->numCycles = cycles;
@@ -251,7 +240,7 @@ public:
         PerformFunction();
     }
 
-    // Function for updating the output latches
+    // Function for connecting the output latches
     void connectOutputLatches(int** latches) {
         outputLatch = latches[0];
     }
@@ -263,9 +252,9 @@ public:
     }
 
 private:
-    int area;
-    int power;
-    int numCycles;
+    double area;
+    double power;
+    double numCycles;
     int shiftDirection; // 0 -> right shift, 1 -> left shift
     int* port1;
     int* port2;
@@ -281,7 +270,7 @@ private:
  */
 class Logic : public Device {
 public:
-    Logic(int area, double power, int cycles) {
+    Logic(double area, double power, double cycles) {
         this->area = area;
         this->power = power;
         this->numCycles = cycles;
@@ -324,7 +313,7 @@ public:
         logicalFunction = signal;
     }
 
-    // Function for updating the output latches
+    // Function for connecting the output latches
     void connectOutputLatches(int** latches) {
         outputLatch = latches[0];
     }
@@ -336,9 +325,9 @@ public:
     }
 
 private:
-    int area;
-    int power;
-    int numCycles;
+    double area;
+    double power;
+    double numCycles;
     int logicalFunction; // 0 -> NOT, 1 -> AND, 2 -> OR, 3 -> XOR
     int* port1;
     int* port2;
@@ -360,33 +349,32 @@ public:
         this->numCycles = cycles;
     }
 
-    void ProcessDataInput(long long val) {
-        value = val;
-    }
-
     // Function for performing the device's main function
     void PerformFunction() {
-        return;
     }
 
     // Function for reacting to the clock signal
     void OnClockSignal() {
-        *outputLatch = value;
     }
 
-    // Function for reacting to control signals
-    long long OnControlSignal() {
-        return value;
+    // Function for reacting to control signals (signal meaning: 0 -> read, 1 -> write)
+    void OnControlSignal(int signal) {
+        if (signal == 0) {
+            outputLatch->setValue(value);
+        }
+        else if (signal == 1) {
+            value = inputPort->getValue();
+        }
     }
 
-    // Function for updating the output latches
-    void connectOutputLatches(int** latches) {
-        outputLatch = latches[0];
+    // Function for connecting the output latches
+    void connectOutputLatches(Port* latch) {
+        outputLatch = latch;
     }
 
     // Function for connecting input ports
-    void ConnectInputPorts(int** ports) {
-        port = ports[0];
+    void ConnectInputPorts(Port* port) {
+        inputPort = port;
     }
 
 private:
@@ -394,8 +382,8 @@ private:
     double power;
     double numCycles;
     long long value;
-    int* port;
-    int* outputLatch;
+    Port* inputPort;
+    Port* outputLatch;
 
 };
 
@@ -404,52 +392,79 @@ private:
  */
 class RegisterFile : public Device {
 public:
-    RegisterFile(int area, double power, int cycles) {
-        this->area = area;
-        this->power = power;
-        this->numCycles = cycles;
+    RegisterFile() {
         for (int i = 0; i < 32; i++) {
             registers.push_back(Register(200, 0.05, 0.5));
         }
     }
 
-    void ProcessDataInput(int addr, long long val) {
-        registers[addr].ProcessDataInput(val);
-    }
-
     // Function for performing the device's main function
     void PerformFunction() {
-        return;
     }
 
     // Function for reacting to the clock signal
     void OnClockSignal() {
-        *outputLatch = value;
     }
 
     // Function for reacting to control signals
-    void OnControlSignal(int addr1, int addr2) {
-        value1 = registers[addr1].OnControlSignal();
-        value2 = registers[addr1].OnControlSignal();
+    void OnControlSignal(int signal) {
+        int addr1;
+        int addr2;
+        switch (signal) {
+            case 0:
+                break;
+            case 1:
+                addr1 = inputPorts[0].getValue();
+                registers[addr1].connectOutputLatches(outputLatches[0]);
+                registers[addr1].OnControlSignal(0);
+                break;
+            case 2:
+                addr1 = inputPorts[0].getValue();
+                addr2 = inputPorts[2].getValue();
+                registers[addr1].connectOutputLatches(outputLatches[0]);
+                registers[addr2].connectOutputLatches(outputLatches[1]);
+                registers[addr1].OnControlSignal(0);
+                registers[addr2].OnControlSignal(0);
+                break;
+            case 3:
+                addr1 = inputPorts[1].getValue();
+                registers[addr1].ConnectInputPorts(&inputPorts[0]);
+                registers[addr1].OnControlSignal(1);
+                break;
+        }
+    }
+    void OnClockSignal(int signal) {
+        switch (signal) {
+            case 0:
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+        }
     }
 
     // Function for updating the output latches
-    void connectOutputLatches(int** latches) {
-        outputLatch = latches[0];
+    // Function for connecting the output latches
+    void connectOutputLatches(int id, Port* latch) {
+        outputLatches[id] = latch;
     }
-
     // Function for connecting input ports
-    void ConnectInputPorts(int** ports) {
-        port = ports[0];
+    void ConnectInputPorts(int id, Port* port) {
+        inputPorts[id] = *port;
     }
 
 private:
-    int area;
-    int power;
-    int numCycles;
+    double area = 20000;
+    double power = 4;
+    double numCycles = 1;
     std::vector<Register> registers;
     long long value;
     int* port;
+    Port inputPorts[2];
+    Port* outputLatches[2];
     int* outputLatch;
     int* outputLatch2;
     long long value1;
@@ -460,6 +475,7 @@ private:
 class Processor {
 public:
     Processor() {
+        
     }
 private:
 };
@@ -492,24 +508,30 @@ int main() {
     std::cout << "Register 3: " << decoded.reg3 << std::endl;
     std::cout << "Literal: " << decoded.literal << std::endl;
 
-    int p1 = decoded.reg2;
-    int p2 = decoded.reg3;
-    Port port1;
-    Port port2;
-    port1.setValue(decoded.reg2);
-    port2.setValue(decoded.reg3);
-    // ports[0] = &p1;
-    // ports[1] = &p2;
-    // latches[0] = &latch;
-    Port latch;
-    Addr addr(400, 0.5, 1);
-    addr.ConnectInputPorts(0, &port1);
-    addr.ConnectInputPorts(1, &port2);
-    addr.connectOutputLatches(&latch);
-    // addr.ProcessDataInput();
-    addr.PerformFunction();
-    addr.OnClockSignal();
-    std::cout << "result: " << latch.getValue() << std::endl;
+    // int p1 = decoded.reg2;
+    // int p2 = decoded.reg3;
+    // Port port1;
+    // Port port2;
+    // port1.setValue(decoded.reg2);
+    // port2.setValue(decoded.reg3);
+
+    // RegisterFile registerFile;
+    // registerFile.ConnectInputPorts(0, &port1);
+    // registerFile.OnControlSignal(0);
+
+    // registerFile.ConnectInputPorts(0, &port2);
+    // registerFile.OnControlSignal(0);
+
+
+    // Port latch;
+    // Addr addr(400, 0.5, 1);
+    // addr.ConnectInputPorts(0, &port1);
+    // addr.ConnectInputPorts(1, &port2);
+    // addr.connectOutputLatches(&latch);
+    // // addr.ProcessDataInput();
+    // addr.PerformFunction();
+    // addr.OnClockSignal();
+    // std::cout << "result: " << latch.getValue() << std::endl;
 
     return 0;
 }
