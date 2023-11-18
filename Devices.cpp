@@ -21,6 +21,73 @@ Instruction decodeInstruction(uint32_t instruction) {
     result.reg3 = (instruction >> 12) & 0x1F;    // Extracting the third register specifier
     result.literal = instruction & 0xFFF;        // Extracting the 12-bit literal
 
+
+    switch(result.opcode){
+        case 0b00000:
+            // set control signals and pass function for "add r1 r2 r3"
+            break;
+        case 0b00001:
+            // set control signals and pass function for "addi r1 L"
+        case 0b00010:
+            // set control signals and pass function for "sub r1 r2 r3"
+        case 0b00011:
+            // set control signals and pass function for "subi r1 L"
+        case 0b00100:
+            // set control signals and pass function for "mul r1 r2 r3"
+        case 0b00101:
+            // set control signals and pass function for "div r1 r2 r3"
+        case 0b00110:
+            // set control signals and pass function for "and r1 r2 r3"
+        case 0b00111:
+            // set control signals and pass function for "or r1 r2 r3"
+        case 0b01000:
+            // set control signals and pass function for "xor r1 r2 r3"
+        case 0b01001:
+            // set control signals and pass function for "not r1 r2" r1=~r3
+        case 0b01010:
+            // set control signals and pass function for "shftr r1 r2 r3" r1=r2>>r3
+        case 0b01011:
+            // set control signals and pass function for "shftri r1 L"
+        case 0b01100:
+            // set control signals and pass function for "shftl r1 r2 r3"
+        case 0b01101:
+            // set control signals and pass function for "shftli r1 L"
+        case 0b01110:
+            // set control signals and pass function for "br r1" pc=r1
+        case 0b01111:
+            // set control signals and pass function for "brr r1" pc = pc + 1
+        case 0b10000:
+            // set control signals and pass function for "brr L" pc = pc + L
+        case 0b10001:
+            // set control signals and pass function for "brnz r1 r2" pc = (r2==0)? pc+4 : r1
+        case 0b10010:
+            // set control signals and pass function for "call r1" mem[r31-8]= pc+4 also pc= r1
+        case 0b10011:
+            // set control signals and pass function for "return" pc= mem[r31-8]
+        case 0b10100:
+            // set control signals and pass function for "halt"
+        case 0b10101:
+            // set control signals and pass function for "mov r1  r2(L)" r1=mem[r2+L]
+        case 0b10110:
+            // set control signals and pass function for "mov r1 r2" r1=r2
+        case 0b10111:
+            // set control signals and pass function for "mov r1 L" r1[52:63] = L
+        case 0b11000:
+            // set control signals and pass function for "mov r1(L) r2" mem[r1+l] = r2
+        case 0b11001:
+            // set control signals and pass function for "addf r1 r2 r3"
+        case 0b11010:
+            // set control signals and pass function for "subf r1 r2 r3"
+        case 0b11011:
+            // set control signals and pass function for "mulf r1 r2 r3"
+        case 0b11100:
+            // set control signals and pass function for "divf r1 r2 r3"
+        case 0b11101:
+            // set control signals and pass function for "input r1 r2" r1=input[r2]
+        case 0b11110:
+            // set control signals and pass function for "out r1 r2" output[r1]=r2
+    
+
     return result;
 }
 
