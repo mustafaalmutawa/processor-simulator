@@ -86,12 +86,7 @@ Instruction decodeInstruction(uint32_t instruction) {
             // set control signals and pass function for "input r1 r2" r1=input[r2]
         case 0b11110:
             // set control signals and pass function for "out r1 r2" output[r1]=r2
-<<<<<<< Updated upstream
-
-=======
     }
-    
->>>>>>> Stashed changes
 
     return result;
 }
@@ -572,6 +567,7 @@ int main() {
     Port port2;
     Port latch1;
     Port latch2;
+
     port1.setValue(decoded.reg2);
     port2.setValue(4);
 
