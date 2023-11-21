@@ -86,6 +86,7 @@ Instruction decodeInstruction(uint32_t instruction) {
             // set control signals and pass function for "input r1 r2" r1=input[r2]
         case 0b11110:
             // set control signals and pass function for "out r1 r2" output[r1]=r2
+            break;
     }
 
     return result;
@@ -553,21 +554,21 @@ public:
             case 0:
                 break;
             case 1:
-                address1 = inputPorts[0].getValue();
+                address1 = inputPorts[0]->getValue();
                 registers[address1].connectOutputLatches(outputLatches[0]);
                 registers[address1].OnControlSignal(0);
                 break;
             case 2:
-                address1 = inputPorts[0].getValue();
-                address2 = inputPorts[1].getValue();
+                address1 = inputPorts[0]->getValue();
+                address2 = inputPorts[1]->getValue();
                 registers[address1].connectOutputLatches(outputLatches[0]);
                 registers[address2].connectOutputLatches(outputLatches[1]);
                 registers[address1].OnControlSignal(0);
                 registers[address2].OnControlSignal(0);
                 break;
             case 3:
-                address1 = inputPorts[1].getValue();
-                registers[address1].ConnectInputPorts(&inputPorts[0]);
+                address1 = inputPorts[1]->getValue();
+                registers[address1].ConnectInputPorts(inputPorts[0]);
                 registers[address1].OnControlSignal(1);
                 break;
         }
@@ -592,7 +593,7 @@ public:
     }
     // Function for connecting input ports
     void ConnectInputPorts(int id, Port* port) {
-        inputPorts[id] = *port;
+        inputPorts[id] = port;
     }
 
 private:
@@ -602,7 +603,7 @@ private:
     std::vector<Register> registers;
     long long value;
     int* port;
-    Port inputPorts[2];
+    Port* inputPorts[2];
     Port* outputLatches[2];
     int* outputLatch;
     int* outputLatch2;
@@ -623,20 +624,6 @@ private:
 int main() {
     std::cout << "Hello, World!" << std::endl;
 
-    // int p1 = 16;
-    // int p2 = 2;
-    // int* ports[] = {&p1, &p2};
-    // int latch;
-    // int* latches[] = {&latch};
-    // Shifter shifter(200, 0.5, 2);
-    // shifter.ConnectInputPorts(ports);
-    // shifter.connectOutputLatches(latches);
-    // shifter.OnControlSignal(1);
-    // shifter.ProcessDataInput();
-    // shifter.PerformFunction();
-    // shifter.OnClockSignal();
-    // std::cout << "result: " << **latches << std::endl;
-
     uint32_t encodedInstruction = 0x483000;
     Instruction decoded = decodeInstruction(encodedInstruction);
 
@@ -648,45 +635,52 @@ int main() {
     std::cout << "Literal: " << decoded.literal << std::endl;
 
     RegisterFile registerFile;
-    int p1 = decoded.reg2;
-    int p2 = decoded.reg3;
     Port port1;
     Port port2;
     Port latch1;
     Port latch2;
 
-    port1.setValue(decoded.reg2);
-    port2.setValue(4);
-
     registerFile.ConnectInputPorts(0, &port1);
     registerFile.ConnectInputPorts(1, &port2);
+
+    // write value 4 to register at adddress 4
+    port1.setValue(4);
+    port2.setValue(decoded.reg2);
     registerFile.OnControlSignal(3);
 
+    // write value 3 to register at adddress 3
+    port1.setValue(decoded.reg3);
+    port2.setValue(3);
+    registerFile.OnControlSignal(3);
+
+
+    // read values at register 4 and 3
+    port1.setValue(decoded.reg2);
+    port2.setValue(decoded.reg3);
     registerFile.connectOutputLatches(0, &latch1);
     registerFile.connectOutputLatches(1, &latch2);
     registerFile.OnControlSignal(2);
-
-    // registerFile.connectOutputLatches(1, &latch2);
-    // registerFile.OnControlSignal(1);
-
     std::cout << "registr value: " << latch1.getValue() << std::endl;
     std::cout << "registr value: " << latch2.getValue() << std::endl;
 
-    // port1.setValue(decoded.reg3);
-    // port2.setValue(3);
-    // registerFile.ConnectInputPorts(0, &port2);
-    // registerFile.OnControlSignal(0);
 
-    // registerFile.connectOutputLatches(0, &latch);
+    // add values in register 4 and 3
+    Addr addr;
+    Port latch;
+    addr.ConnectInputPorts(0, &port1);
+    addr.ConnectInputPorts(1, &port2);
+    addr.connectOutputLatches(&latch);
+    addr.OnClockSignal();
+    std::cout << "result: " << latch.getValue() << std::endl;
 
-    // Addr addr;
-    // addr.ConnectInputPorts(0, &port1);
-    // addr.ConnectInputPorts(1, &port2);
-    // addr.connectOutputLatches(&latch);
-    // // addr.ProcessDataInput();
-    // addr.PerformFunction();
-    // addr.OnClockSignal();
-    // std::cout << "result: " << latch.getValue() << std::endl;
+
+    // multiply in register 4 and 3
+    Port latch;
+    addr.ConnectInputPorts(0, &port1);
+    addr.ConnectInputPorts(1, &port2);
+    addr.connectOutputLatches(&latch);
+    addr.OnClockSignal();
+    std::cout << "result: " << latch.getValue() << std::endl;
 
     return 0;
 }
