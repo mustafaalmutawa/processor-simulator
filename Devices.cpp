@@ -172,7 +172,7 @@ public:
     void PerformFunction() {
         std::cout << "port1 value: " << inputPorts[0]->getValue() << std::endl;
         std::cout << "port2 value: " << inputPorts[1]->getValue() << std::endl;
-        outputVal = inputPorts[0]->getValue() / inputPorts[1]->getValue();
+        outputVal = inputPorts[0]->getValue() * inputPorts[1]->getValue();
     }
 
     // Function for reacting to the clock signal
@@ -218,19 +218,17 @@ public:
         this->numCycles = cycles;
     }
 
-    void ProcessDataInput() {
-        inputVal1 = *port1;
-        inputVal2 = *port2;
-    }
-
     // Function for performing the device's main function
     void PerformFunction() {
-        outputVal = inputVal1 / inputVal2;
+        std::cout << "port1 value: " << inputPorts[0]->getValue() << std::endl;
+        std::cout << "port2 value: " << inputPorts[1]->getValue() << std::endl;
+        outputVal = inputPorts[0]->getValue() / inputPorts[1]->getValue();
     }
 
     // Function for reacting to the clock signal
     void OnClockSignal() {
-        *outputLatch = outputVal;
+        PerformFunction();
+        (*outputLatch).setValue(outputVal);
     }
 
 
@@ -239,27 +237,23 @@ public:
         return;
     }
 
-    // Function for updating the output latches
-    void connectOutputLatches(int** latches) {
-        outputLatch = latches[0];
+    // Function for connecting the output latches
+    void connectOutputLatches(Port* latch) {
+        outputLatch = latch;
     }
 
     // Function for connecting input ports
-    void ConnectInputPorts(int** ports) {
-        port1 = ports[0];
-        port2 = ports[1];
+    void ConnectInputPorts(int id, Port* port) {
+        inputPorts[id] = port;
     }
 
 private:
-    int area;
-    int power;
-    int numCycles;
-    int* port1;
-    int* port2;
-    int* outputLatch;
-    int inputVal1;
-    int inputVal2;
-    int outputVal;
+    double area;
+    double power;
+    double numCycles;
+    Port* inputPorts[2];
+    Port* outputLatch; // the latch is defined with port class because it serves the same functionality
+    long long outputVal;
 
 };
 
