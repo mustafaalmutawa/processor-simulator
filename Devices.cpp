@@ -86,7 +86,12 @@ Instruction decodeInstruction(uint32_t instruction) {
             // set control signals and pass function for "input r1 r2" r1=input[r2]
         case 0b11110:
             // set control signals and pass function for "out r1 r2" output[r1]=r2
+<<<<<<< Updated upstream
 
+=======
+    }
+    
+>>>>>>> Stashed changes
 
     return result;
 }
@@ -113,10 +118,10 @@ private:
  */
 class Addr : public Device {
 public:
-    Addr(double area, double power, double cycles) {
-        this->area = area;
-        this->power = power;
-        this->numCycles = cycles;
+    Addr() {
+        this->area = 400;
+        this->power = 0.5;
+        this->numCycles = 1;
     }
 
     // Function for performing the device's main function
@@ -442,6 +447,9 @@ private:
 class RegisterFile : public Device {
 public:
     RegisterFile() {
+        this->area = 20000;
+        this->power = 4;
+        this->numCycles = 1;
         for (int i = 0; i < 32; i++) {
             registers.push_back(Register(200, 0.05, 0.5));
         }
@@ -457,28 +465,28 @@ public:
 
     // Function for reacting to control signals
     void OnControlSignal(int signal) {
-        int addr1;
-        int addr2;
+        int address1;
+        int address2;
         switch (signal) {
             case 0:
                 break;
             case 1:
-                addr1 = inputPorts[0].getValue();
-                registers[addr1].connectOutputLatches(outputLatches[0]);
-                registers[addr1].OnControlSignal(0);
+                address1 = inputPorts[0].getValue();
+                registers[address1].connectOutputLatches(outputLatches[0]);
+                registers[address1].OnControlSignal(0);
                 break;
             case 2:
-                addr1 = inputPorts[0].getValue();
-                addr2 = inputPorts[2].getValue();
-                registers[addr1].connectOutputLatches(outputLatches[0]);
-                registers[addr2].connectOutputLatches(outputLatches[1]);
-                registers[addr1].OnControlSignal(0);
-                registers[addr2].OnControlSignal(0);
+                address1 = inputPorts[0].getValue();
+                address2 = inputPorts[1].getValue();
+                registers[address1].connectOutputLatches(outputLatches[0]);
+                registers[address2].connectOutputLatches(outputLatches[1]);
+                registers[address1].OnControlSignal(0);
+                registers[address2].OnControlSignal(0);
                 break;
             case 3:
-                addr1 = inputPorts[1].getValue();
-                registers[addr1].ConnectInputPorts(&inputPorts[0]);
-                registers[addr1].OnControlSignal(1);
+                address1 = inputPorts[1].getValue();
+                registers[address1].ConnectInputPorts(&inputPorts[0]);
+                registers[address1].OnControlSignal(1);
                 break;
         }
     }
@@ -506,9 +514,9 @@ public:
     }
 
 private:
-    double area = 20000;
-    double power = 4;
-    double numCycles = 1;
+    double area;
+    double power;
+    double numCycles;
     std::vector<Register> registers;
     long long value;
     int* port;
@@ -557,23 +565,38 @@ int main() {
     std::cout << "Register 3: " << decoded.reg3 << std::endl;
     std::cout << "Literal: " << decoded.literal << std::endl;
 
-    // int p1 = decoded.reg2;
-    // int p2 = decoded.reg3;
-    // Port port1;
-    // Port port2;
-    // port1.setValue(decoded.reg2);
-    // port2.setValue(decoded.reg3);
+    RegisterFile registerFile;
+    int p1 = decoded.reg2;
+    int p2 = decoded.reg3;
+    Port port1;
+    Port port2;
+    Port latch1;
+    Port latch2;
+    port1.setValue(decoded.reg2);
+    port2.setValue(4);
 
-    // RegisterFile registerFile;
-    // registerFile.ConnectInputPorts(0, &port1);
-    // registerFile.OnControlSignal(0);
+    registerFile.ConnectInputPorts(0, &port1);
+    registerFile.ConnectInputPorts(1, &port2);
+    registerFile.OnControlSignal(3);
 
+    registerFile.connectOutputLatches(0, &latch1);
+    registerFile.connectOutputLatches(1, &latch2);
+    registerFile.OnControlSignal(2);
+
+    // registerFile.connectOutputLatches(1, &latch2);
+    // registerFile.OnControlSignal(1);
+
+    std::cout << "registr value: " << latch1.getValue() << std::endl;
+    std::cout << "registr value: " << latch2.getValue() << std::endl;
+
+    // port1.setValue(decoded.reg3);
+    // port2.setValue(3);
     // registerFile.ConnectInputPorts(0, &port2);
     // registerFile.OnControlSignal(0);
 
+    // registerFile.connectOutputLatches(0, &latch);
 
-    // Port latch;
-    // Addr addr(400, 0.5, 1);
+    // Addr addr;
     // addr.ConnectInputPorts(0, &port1);
     // addr.ConnectInputPorts(1, &port2);
     // addr.connectOutputLatches(&latch);
