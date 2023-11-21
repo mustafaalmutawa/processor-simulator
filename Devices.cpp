@@ -328,7 +328,7 @@ public:
     void PerformFunction() {
         switch  (logicalFunction) {
             case 0: // NOT operation
-                outputVal = ~inputPorts[0]->getValue()
+                outputVal = ~inputPorts[0]->getValue();
                 break;
 
             case 1: // AND operation
@@ -376,6 +376,103 @@ private:
     long long outputVal;
 
 };
+
+
+/**
+ * Comparator Device (under construction)
+ */
+class Comparator : public Device {
+public:
+    Comparator() {
+        this->area = 400;
+        this->power = 0.5;
+        this->numCycles = 1;
+    }
+
+    // Function for performing the device's main function
+    void PerformFunction() {
+        outputVal = ~(inputPorts[0]->getValue() == inputPorts[1]->getValue());
+    }
+
+    // Function for reacting to the clock signal
+    void OnClockSignal() {
+        PerformFunction();
+        (*outputLatch).setValue(outputVal);
+    }
+
+    // Function for reacting to control signals
+    void OnControlSignal() {
+        return;
+    }
+
+    // Function for connecting the output latches
+    void connectOutputLatches(Port* latch) {
+        outputLatch = latch;
+    }
+
+    // Function for connecting input ports
+    void ConnectInputPorts(int id, Port* port) {
+        inputPorts[id] = port;
+    }
+
+private:
+    double area;
+    double power;
+    double numCycles;
+    Port* inputPorts[2];
+    Port* outputLatch; // the latch is defined with port class because it serves the same functionality
+    long long outputVal;
+
+};
+
+
+/**
+ * Comparator Device (under construction)
+ */
+class Twos : public Device {
+public:
+    Twos() {
+        this->area = 200;
+        this->power = 0.25;
+        this->numCycles = 1;
+    }
+
+    // Function for performing the device's main function
+    void PerformFunction() {
+        outputVal = (~inputPorts[0]->getValue())+1; // this would only work if this was in bits
+    }
+
+    // Function for reacting to the clock signal
+    void OnClockSignal() {
+        PerformFunction();
+        (*outputLatch).setValue(outputVal);
+    }
+
+    // Function for reacting to control signals
+    void OnControlSignal() {
+        return;
+    }
+
+    // Function for connecting the output latches
+    void connectOutputLatches(Port* latch) {
+        outputLatch = latch;
+    }
+
+    // Function for connecting input ports
+    void ConnectInputPorts(int id, Port* port) {
+        inputPorts[id] = port;
+    }
+
+private:
+    double area;
+    double power;
+    double numCycles;
+    Port* inputPorts[1];
+    Port* outputLatch; // the latch is defined with port class because it serves the same functionality
+    long long outputVal;
+
+};
+
 
 /**
  * Register Device
