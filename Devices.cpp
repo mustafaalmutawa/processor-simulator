@@ -162,10 +162,10 @@ private:
  */
 class Multiplier : public Device {
 public:
-    Multiplier(double area, double power, double cycles) {
-        this->area = area;
-        this->power = power;
-        this->numCycles = cycles;
+    Multiplier() {
+        this->area = 2000;
+        this->power = 1.5;
+        this->numCycles = 3;
     }
 
     // Function for performing the device's main function
@@ -212,10 +212,10 @@ private:
  */
 class Divider : public Device {
 public:
-    Divider(int area, double power, int cycles) {
-        this->area = area;
-        this->power = power;
-        this->numCycles = cycles;
+    Divider() {
+        this->area = 5000;
+        this->power = 1;
+        this->numCycles = 8;
     }
 
     // Function for performing the device's main function
@@ -262,10 +262,10 @@ private:
  */
 class Shifter : public Device {
 public:
-    Shifter(double area, double power, double cycles) {
-        this->area = area;
-        this->power = power;
-        this->numCycles = cycles;
+    Shifter() {
+        this->area = 200;
+        this->power = 0.5;
+        this->numCycles = 1;
     }
 
     // Function for performing the device's main function
@@ -290,7 +290,6 @@ public:
     // Function for reacting to control signals
     void OnControlSignal(int signal) {
         shiftDirection = signal;
-        PerformFunction();
     }
 
     // Function for connecting the output latches
@@ -319,42 +318,37 @@ private:
  */
 class Logic : public Device {
 public:
-    Logic(double area, double power, double cycles) {
-        this->area = area;
-        this->power = power;
-        this->numCycles = cycles;
-    }
-
-    // Function for processing the data from input ports
-    void ProcessDataInput() {
-        inputVal1 = *port1;
-        inputVal2 = *port2;
+    Logic() {
+        this->area = 600;
+        this->power = 0.75;
+        this->numCycles = 1;
     }
 
     // Function for performing the device's main function
     void PerformFunction() {
         switch  (logicalFunction) {
             case 0: // NOT operation
-                outputVal = ~inputVal1;
+                outputVal = ~inputPorts[0]->getValue()
                 break;
 
             case 1: // AND operation
-                outputVal = inputVal1 & inputVal2;
+                outputVal = inputPorts[0]->getValue() & inputPorts[1]->getValue();
                 break;
 
             case 2: // OR operation
-                outputVal = inputVal1 | inputVal2;
+                outputVal = inputPorts[0]->getValue() | inputPorts[1]->getValue();
                 break;
 
             case 3: // XOR operation
-                outputVal = inputVal1 ^ inputVal2;
+                outputVal = inputPorts[0]->getValue() ^ inputPorts[1]->getValue();
                 break;
         }
     }
 
     // Function for reacting to the clock signal
     void OnClockSignal() {
-        *outputLatch = outputVal;
+        PerformFunction();
+        (*outputLatch).setValue(outputVal);
     }
 
     // Function for reacting to control signals
@@ -363,14 +357,13 @@ public:
     }
 
     // Function for connecting the output latches
-    void connectOutputLatches(int** latches) {
-        outputLatch = latches[0];
+    void connectOutputLatches(Port* latch) {
+        outputLatch = latch;
     }
 
     // Function for connecting input ports
-    void ConnectInputPorts(int** ports) {
-        port1 = ports[0];
-        port2 = ports[1];
+    void ConnectInputPorts(int id, Port* port) {
+        inputPorts[id] = port;
     }
 
 private:
@@ -378,12 +371,9 @@ private:
     double power;
     double numCycles;
     int logicalFunction; // 0 -> NOT, 1 -> AND, 2 -> OR, 3 -> XOR
-    int* port1;
-    int* port2;
-    int* outputLatch;
-    int inputVal1;
-    int inputVal2;
-    int outputVal;
+    Port* inputPorts[2];
+    Port* outputLatch; // the latch is defined with port class because it serves the same functionality
+    long long outputVal;
 
 };
 
