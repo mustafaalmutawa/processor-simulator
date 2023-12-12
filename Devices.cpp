@@ -1106,16 +1106,16 @@ public:
         registerFile.OnControlSignal(2);
 
         // connect register file output latches to adder input ports
-        Multiplier.inputPorts[0] = registerFile.outputLatches[0];
-        Multiplier.inputPorts[1] = registerFile.outputLatches[1];
+        multiplier.inputPorts[0] = registerFile.outputLatches[0];
+        multiplier.inputPorts[1] = registerFile.outputLatches[1];
 
         // connect addr output latch to register file 1st input port
-        registerFile.inputPorts[0] = Multiplier.outputLatches[0];
+        registerFile.inputPorts[0] = multiplier.outputLatches[0];
         // set value for register file 2nd input port
         registerFile.inputPorts[1]->setValue(register_d);
 
         // send clock signal to perform addition
-        Multiplier.OnClockSignal();
+        multiplier.OnClockSignal();
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
@@ -1132,16 +1132,16 @@ public:
         registerFile.OnControlSignal(2);
 
         // connect register file output latches to adder input ports
-        Divider.inputPorts[0] = registerFile.outputLatches[0];
-        Divider.inputPorts[1] = registerFile.outputLatches[1];
+        divider.inputPorts[0] = registerFile.outputLatches[0];
+        divider.inputPorts[1] = registerFile.outputLatches[1];
 
         // connect addr output latch to register file 1st input port
-        registerFile.inputPorts[0] = Divider.outputLatches[0];
+        registerFile.inputPorts[0] = divider.outputLatches[0];
         // set value for register file 2nd input port
         registerFile.inputPorts[1]->setValue(register_d);
 
         // send clock signal to perform addition
-        Divider.OnClockSignal();
+        divider.OnClockSignal();
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
@@ -1158,17 +1158,17 @@ public:
         registerFile.OnControlSignal(2);
 
         // connect register file output latches to adder input ports
-        Logic.inputPorts[0] = registerFile.outputLatches[0];
-        Logic.inputPorts[1] = registerFile.outputLatches[1];
+        logic.inputPorts[0] = registerFile.outputLatches[0];
+        logic.inputPorts[1] = registerFile.outputLatches[1];
 
         // connect addr output latch to register file 1st input port
-        registerFile.inputPorts[0] = Logic.outputLatches[0];
+        registerFile.inputPorts[0] = logic.outputLatches[0];
         // set value for register file 2nd input port
         registerFile.inputPorts[1]->setValue(register_d);
 
         // send clock signal to perform addition
-        Logic.OnControlSignal(1);
-        Logic.OnClockSignal();
+        logic.OnControlSignal(1);
+        logic.OnClockSignal();
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
@@ -1185,17 +1185,17 @@ public:
         registerFile.OnControlSignal(2);
 
         // connect register file output latches to adder input ports
-        Logic.inputPorts[0] = registerFile.outputLatches[0];
-        Logic.inputPorts[1] = registerFile.outputLatches[1];
+        logic.inputPorts[0] = registerFile.outputLatches[0];
+        logic.inputPorts[1] = registerFile.outputLatches[1];
 
         // connect addr output latch to register file 1st input port
-        registerFile.inputPorts[0] = Logic.outputLatches[0];
+        registerFile.inputPorts[0] = logic.outputLatches[0];
         // set value for register file 2nd input port
         registerFile.inputPorts[1]->setValue(register_d);
 
         // send clock signal to perform addition
-        Logic.OnControlSignal(2);
-        Logic.OnClockSignal();
+        logic.OnControlSignal(2);
+        logic.OnClockSignal();
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
@@ -1211,17 +1211,17 @@ public:
         registerFile.OnControlSignal(2);
 
         // connect register file output latches to adder input ports
-        Logic.inputPorts[0] = registerFile.outputLatches[0];
-        Logic.inputPorts[1] = registerFile.outputLatches[1];
+        logic.inputPorts[0] = registerFile.outputLatches[0];
+        logic.inputPorts[1] = registerFile.outputLatches[1];
 
         // connect addr output latch to register file 1st input port
-        registerFile.inputPorts[0] = Logic.outputLatches[0];
+        registerFile.inputPorts[0] = logic.outputLatches[0];
         // set value for register file 2nd input port
         registerFile.inputPorts[1]->setValue(register_d);
 
         // send clock signal to perform addition
-        Logic.OnControlSignal(3);
-        Logic.OnClockSignal();
+        logic.OnControlSignal(3);
+        logic.OnClockSignal();
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
@@ -1237,16 +1237,16 @@ public:
         registerFile.OnControlSignal(1);
 
         // connect register file output latches to adder input ports
-        Logic.inputPorts[0] = registerFile.outputLatches[0];
+        logic.inputPorts[0] = registerFile.outputLatches[0];
 
         // connect addr output latch to register file 1st input port
-        registerFile.inputPorts[0] = Logic.outputLatches[0];
+        registerFile.inputPorts[0] = logic.outputLatches[0];
         // set value for register file 2nd input port
         registerFile.inputPorts[1]->setValue(register_d);
 
         // send clock signal to perform addition
-        Logic.OnControlSignal(0);
-        Logic.OnClockSignal();
+        logic.OnControlSignal(0);
+        logic.OnClockSignal();
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
@@ -1263,17 +1263,17 @@ public:
         registerFile.OnControlSignal(2);
 
         // connect register file output latches to adder input ports
-        Shifter.inputPorts[0] = registerFile.outputLatches[0];
-        Shifter.inputPorts[1] = registerFile.outputLatches[1];
+        shifter.inputPorts[0] = registerFile.outputLatches[0];
+        shifter.inputPorts[1] = registerFile.outputLatches[1];
 
         // connect addr output latch to register file 1st input port
-        registerFile.inputPorts[0] = Shifter.outputLatches[0];
+        registerFile.inputPorts[0] = shifter.outputLatches[0];
         // set value for register file 2nd input port
         registerFile.inputPorts[1]->setValue(register_d);
 
         // send clock signal to perform addition
-        Shifter.OnControlSignal(0);
-        Shifter.OnClockSignal();
+        shifter.OnControlSignal(0);
+        shifter.OnClockSignal();
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
@@ -1289,17 +1289,17 @@ public:
         registerFile.OnControlSignal(1);
 
         // connect register file output latches to adder input ports
-        Shifter.inputPorts[0] = registerFile.outputLatches[0];
-        Shifter.inputPorts[1]->setValue(immediate);
+        shifter.inputPorts[0] = registerFile.outputLatches[0];
+        shifter.inputPorts[1]->setValue(immediate);
 
         // connect addr output latch to register file 1st input port
-        registerFile.inputPorts[0] = Shifter.outputLatches[0];
+        registerFile.inputPorts[0] = shifter.outputLatches[0];
         // set value for register file 2nd input port
         registerFile.inputPorts[1]->setValue(register_d);
 
         // send clock signal to perform addition
-        Shifter.OnControlSignal(0);
-        Shifter.OnClockSignal();
+        shifter.OnControlSignal(0);
+        shifter.OnClockSignal();
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
@@ -1316,17 +1316,17 @@ public:
         registerFile.OnControlSignal(2);
 
         // connect register file output latches to adder input ports
-        Shifter.inputPorts[0] = registerFile.outputLatches[0];
-        Shifter.inputPorts[1] = registerFile.outputLatches[1];
+        shifter.inputPorts[0] = registerFile.outputLatches[0];
+        shifter.inputPorts[1] = registerFile.outputLatches[1];
 
         // connect addr output latch to register file 1st input port
-        registerFile.inputPorts[0] = Shifter.outputLatches[0];
+        registerFile.inputPorts[0] = shifter.outputLatches[0];
         // set value for register file 2nd input port
         registerFile.inputPorts[1]->setValue(register_d);
 
         // send clock signal to perform addition
-        Shifter.OnControlSignal(1);
-        Shifter.OnClockSignal();
+        shifter.OnControlSignal(1);
+        shifter.OnClockSignal();
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
@@ -1342,17 +1342,17 @@ public:
         registerFile.OnControlSignal(1);
 
         // connect register file output latches to adder input ports
-        Shifter.inputPorts[0] = registerFile.outputLatches[0];
-        Shifter.inputPorts[1]->setValue(immediate);
+        shifter.inputPorts[0] = registerFile.outputLatches[0];
+        shifter.inputPorts[1]->setValue(immediate);
 
         // connect addr output latch to register file 1st input port
-        registerFile.inputPorts[0] = Shifter.outputLatches[0];
+        registerFile.inputPorts[0] = shifter.outputLatches[0];
         // set value for register file 2nd input port
         registerFile.inputPorts[1]->setValue(register_d);
 
         // send clock signal to perform addition
-        Shifter.OnControlSignal(1);
-        Shifter.OnClockSignal();
+        shifter.OnControlSignal(1);
+        shifter.OnClockSignal();
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
@@ -1434,7 +1434,7 @@ public:
 
         // need to initialise PC
         // connect addr output latch to register file 1st input port
-        PC = registerFile.outputLatches[0];
+        PC = registerFile.outputLatches[0]->getValue();
 
     }
 
@@ -1450,14 +1450,13 @@ public:
 
         // need to initialise PC
         // connect addr output latch to register file 1st input port
-        PC += registerFile.outputLatches[0];
+        PC += registerFile.outputLatches[0]->getValue();
 
     }
 
     // instruction 0x10 brr L
     void Instruction0x10(int immediate) {
         PC += immediate;
-
     }
 
     // instruction 0x11 brnz rd, rs
@@ -1485,16 +1484,16 @@ public:
     }
 
 
-
-
-
-
-
 private:
     RegisterFile registerFile;
     Port latch1;
     Port latch2;
     Addr addr;
+    Multiplier multiplier;
+    Divider divider;
+    Shifter shifter;
+    Logic logic;
+
 };
 
 
