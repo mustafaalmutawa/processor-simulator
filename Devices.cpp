@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdint>
+#include <bitset>
 
 #include "AbstractDevice.h"
 
@@ -12,7 +13,7 @@ struct Instruction {
     uint32_t literal;
 };
 
-Instruction ControlArray(uint32_t instruction) {
+Instruction decodeInstruction(uint32_t instruction) {
     Instruction result;
 
     result.opcode = (instruction >> 27) & 0x1F;  // Extracting the 5-bit opcode
@@ -441,7 +442,10 @@ public:
 
     // Function for performing the device's main function
     void PerformFunction() {
-        outputVal = (~inputPorts[0]->getValue())+1; // this would only work if this was in bits
+
+        outputVal = inputPorts[0]->getValue(); // this would only work if this was in bits
+        std::bitset<32> binaryRepresentation(outputVal);
+        outputVal = (~outputVal) + 1;
     }
 
     // Function for reacting to the clock signal
