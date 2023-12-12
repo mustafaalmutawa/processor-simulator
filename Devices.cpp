@@ -159,6 +159,62 @@ private:
 };
 
 /**
+ * Shifter Device
+ */
+class Shifter : public Device {
+public:
+    Shifter() {
+        this->area = 200;
+        this->power = 0.5;
+        this->numCycles = 1;
+    }
+
+    // Function for performing the device's main function
+    void PerformFunction() {
+
+        std::cout << "port1 value: " << inputPorts[0]->getValue() << std::endl;
+        std::cout << "port2 value: " << inputPorts[1]->getValue() << std::endl;
+        if (shiftDirection == 0) {
+            outputVal = inputPorts[0]->getValue() >> inputPorts[1]->getValue();
+        }
+        else {
+            outputVal = inputPorts[0]->getValue() << inputPorts[1]->getValue();
+        }
+    }
+
+    // Function for reacting to the clock signal
+    void OnClockSignal() {
+        PerformFunction();
+        (*outputLatch).setValue(outputVal);
+    }
+
+    // Function for reacting to control signals
+    void OnControlSignal(int signal) {
+        shiftDirection = signal;
+    }
+
+    // Function for connecting the output latches
+    void connectOutputLatches(Port* latch) {
+        outputLatch = latch;
+    }
+
+    // Function for connecting input ports
+    void ConnectInputPorts(int id, Port* port) {
+        inputPorts[id] = port;
+    }
+
+private:
+    double area;
+    double power;
+    double numCycles;
+    int shiftDirection; // 0 -> right shift, 1 -> left shift
+    Port* inputPorts[2];
+    Port* outputLatch; // the latch is defined with port class because it serves the same functionality
+    long long outputVal;
+
+};
+
+/**
  * Multiplier Device
  */
 class Multiplier : public Device {
@@ -252,62 +308,6 @@ private:
     double area;
     double power;
     double numCycles;
-    Port* inputPorts[2];
-    Port* outputLatch; // the latch is defined with port class because it serves the same functionality
-    long long outputVal;
-
-};
-
-/**
- * Shifter Device
- */
-class Shifter : public Device {
-public:
-    Shifter() {
-        this->area = 200;
-        this->power = 0.5;
-        this->numCycles = 1;
-    }
-
-    // Function for performing the device's main function
-    void PerformFunction() {
-
-        std::cout << "port1 value: " << inputPorts[0]->getValue() << std::endl;
-        std::cout << "port2 value: " << inputPorts[1]->getValue() << std::endl;
-        if (shiftDirection == 0) {
-            outputVal = inputPorts[0]->getValue() >> inputPorts[1]->getValue();
-        }
-        else {
-            outputVal = inputPorts[0]->getValue() << inputPorts[1]->getValue();
-        }
-    }
-
-    // Function for reacting to the clock signal
-    void OnClockSignal() {
-        PerformFunction();
-        (*outputLatch).setValue(outputVal);
-    }
-
-    // Function for reacting to control signals
-    void OnControlSignal(int signal) {
-        shiftDirection = signal;
-    }
-
-    // Function for connecting the output latches
-    void connectOutputLatches(Port* latch) {
-        outputLatch = latch;
-    }
-
-    // Function for connecting input ports
-    void ConnectInputPorts(int id, Port* port) {
-        inputPorts[id] = port;
-    }
-
-private:
-    double area;
-    double power;
-    double numCycles;
-    int shiftDirection; // 0 -> right shift, 1 -> left shift
     Port* inputPorts[2];
     Port* outputLatch; // the latch is defined with port class because it serves the same functionality
     long long outputVal;
@@ -430,9 +430,9 @@ private:
 /**
  * Comparator Device (under construction)
  */
-class Twos : public Device {
+class TwosComplement : public Device {
 public:
-    Twos() {
+    TwosComplement() {
         this->area = 200;
         this->power = 0.25;
         this->numCycles = 1;
@@ -675,11 +675,11 @@ int main() {
 
 
     // multiply in register 4 and 3
-    Port latch;
-    addr.ConnectInputPorts(0, &port1);
-    addr.ConnectInputPorts(1, &port2);
-    addr.connectOutputLatches(&latch);
-    addr.OnClockSignal();
+    Multiplier multiply;
+    multiply.ConnectInputPorts(0, &port1);
+    multiply.ConnectInputPorts(1, &port2);
+    multiply.connectOutputLatches(&latch);
+    multiply.OnClockSignal();
     std::cout << "result: " << latch.getValue() << std::endl;
 
     return 0;
