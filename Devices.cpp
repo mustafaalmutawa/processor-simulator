@@ -612,6 +612,132 @@ private:
 
 };
 
+
+
+
+
+/**
+ * Multiplexer Device
+ */
+class Multiplexer : public Device {
+public:
+    Multiplexer() {
+        this->area = 500;
+        this->power = 0.25;
+        this->numCycles = 0.5;
+    }
+
+    // Function for performing the device's main function
+    void PerformFunction() {
+    }
+
+    // Function for reacting to the clock signal
+    void OnClockSignal() {
+        (*outputLatch).setValue(outputVal);
+    }
+
+    // Function for reacting to control signals
+    void OnControlSignal(int signal) {
+        switch (signal) {
+            case 0:
+                outputVal = (inputPorts[0]->getValue());
+
+                break;
+            case 1:
+                outputVal = (inputPorts[1]->getValue());
+
+                break;
+            case 2:
+                outputVal = (inputPorts[2]->getValue());
+                break;
+            case 3:
+                outputVal = (inputPorts[3]->getValue());
+                break;
+        }
+    }
+
+    // Function for connecting the output latches
+    void connectOutputLatches(Port* latch) {
+        outputLatch = latch;
+    }
+
+    // Function for connecting input ports
+    void ConnectInputPorts(int id, Port* port) {
+        inputPorts[id] = port;
+    }
+
+private:
+    double area;
+    double power;
+    double numCycles;
+    Port* inputPorts[4];
+    Port* outputLatch; // the latch is defined with port class because it serves the same functionality
+    long long outputVal;
+
+};
+
+/**
+ * Demultiplexer Device
+ */
+class Demultiplexer : public Device {
+public:
+    Demultiplexer() {
+        this->area = 500;
+        this->power = 0.25;
+        this->numCycles = 0.5;
+    }
+
+    // Function for performing the device's main function
+    void PerformFunction() {
+    }
+
+    // Function for reacting to the clock signal
+    void OnClockSignal() {
+    }
+
+    // Function for reacting to control signals
+    void OnControlSignal(int signal) {
+        long long inputVal = (inputPort->getValue());
+        switch (signal) {
+            case 0:
+                outputLatch[0]->setValue(inputVal);
+
+                break;
+            case 1:
+                outputLatch[1]->setValue(inputVal);
+
+                break;
+            case 2:
+                outputLatch[2]->setValue(inputVal);
+                break;
+            case 3:
+                outputLatch[3]->setValue(inputVal);
+                break;
+        }
+    }
+
+    // Function for connecting the output latches
+    void connectOutputLatches(int id, Port* latch) {
+        outputLatch[id] = latch;
+    }
+
+    // Function for connecting input ports
+    void ConnectInputPorts(Port* port) {
+        inputPort = port;
+    }
+
+private:
+    double area;
+    double power;
+    double numCycles;
+    Port* inputPort;
+    Port* outputLatch[4]; // the latch is defined with port class because it serves the same functionality
+    long long outputVal;
+
+};
+
+
+
 class Processor {
 public:
     Processor() {
