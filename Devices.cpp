@@ -463,16 +463,6 @@ public:
         }
     }
 
-    // Function for connecting the output latches
-    void connectOutputLatches(Port* latch) {
-        outputLatch = latch;
-    }
-
-    // Function for connecting input ports
-    void ConnectInputPorts(int id, Port* port) {
-        inputPorts[id] = port;
-    }
-
 public:
     Port* inputPorts[4];
     Port* outputLatches[1];
@@ -510,34 +500,23 @@ public:
 
     // Function for reacting to control signals
     void OnControlSignal(int signal) {
-        long long inputVal = inputPort->getValue();
+        long long inputVal = inputPorts[0]->getValue();
         switch (signal) {
             case 0:
-                outputLatch[0]->setValue(inputVal);
-
+                outputLatches[0]->setValue(inputVal);
                 break;
             case 1:
-                outputLatch[1]->setValue(inputVal);
-
+                outputLatches[1]->setValue(inputVal);
                 break;
             case 2:
-                outputLatch[2]->setValue(inputVal);
+                outputLatches[2]->setValue(inputVal);
                 break;
             case 3:
-                outputLatch[3]->setValue(inputVal);
+                outputLatches[3]->setValue(inputVal);
                 break;
         }
     }
 
-    // Function for connecting the output latches
-    void connectOutputLatches(int id, Port* latch) {
-        outputLatch[id] = latch;
-    }
-
-    // Function for connecting input ports
-    void ConnectInputPorts(Port* port) {
-        inputPort = port;
-    }
 
 public:
     Port* inputPorts[1];
@@ -581,15 +560,6 @@ public:
         return;
     }
 
-    // Function for connecting the output latches
-    void connectOutputLatches(Port* latch) {
-        outputLatch = latch;
-    }
-
-    // Function for connecting input ports
-    void ConnectInputPorts(int id, Port* port) {
-        inputPorts[id] = port;
-    }
 
 public:
     Port* inputPorts[1];
@@ -612,6 +582,8 @@ public:
         this->area = 500;
         this->power = 0.25;
         this->numCycles = 0.5;
+        inputPorts[0] = new Port();
+        outputLatches[0] = new Port();
     }
 
     // Function for performing the device's main function
@@ -625,69 +597,97 @@ public:
         result.reg3 = (instruction >> 12) & 0x1F;    // Extracting the third register specifier
         result.literal = instruction & 0xFFF;        // Extracting the 12-bit literal
 
-
         switch(result.opcode){
             case 0b00000:
                 // set control signals and pass function for "add r1 r2 r3"
                 break;
             case 0b00001:
                 // set control signals and pass function for "addi r1 L"
+                break;
             case 0b00010:
                 // set control signals and pass function for "sub r1 r2 r3"
+                break;
             case 0b00011:
                 // set control signals and pass function for "subi r1 L"
+                break;
             case 0b00100:
                 // set control signals and pass function for "mul r1 r2 r3"
+                break;
             case 0b00101:
                 // set control signals and pass function for "div r1 r2 r3"
+                break;
             case 0b00110:
                 // set control signals and pass function for "and r1 r2 r3"
+                break;
             case 0b00111:
                 // set control signals and pass function for "or r1 r2 r3"
+                break;
             case 0b01000:
                 // set control signals and pass function for "xor r1 r2 r3"
+                break;
             case 0b01001:
                 // set control signals and pass function for "not r1 r2" r1=~r3
+                break;
             case 0b01010:
                 // set control signals and pass function for "shftr r1 r2 r3" r1=r2>>r3
+                break;
             case 0b01011:
                 // set control signals and pass function for "shftri r1 L"
+                break;
             case 0b01100:
                 // set control signals and pass function for "shftl r1 r2 r3"
+                break;
             case 0b01101:
                 // set control signals and pass function for "shftli r1 L"
+                break;
             case 0b01110:
                 // set control signals and pass function for "br r1" pc=r1
+                break;
             case 0b01111:
                 // set control signals and pass function for "brr r1" pc = pc + 1
+                break;
             case 0b10000:
                 // set control signals and pass function for "brr L" pc = pc + L
+                break;
             case 0b10001:
                 // set control signals and pass function for "brnz r1 r2" pc = (r2==0)? pc+4 : r1
+                break;
             case 0b10010:
                 // set control signals and pass function for "call r1" mem[r31-8]= pc+4 also pc= r1
+                break;
             case 0b10011:
                 // set control signals and pass function for "return" pc= mem[r31-8]
+                break;
             case 0b10100:
                 // set control signals and pass function for "halt"
+                break;
             case 0b10101:
                 // set control signals and pass function for "mov r1  r2(L)" r1=mem[r2+L]
+                break;
             case 0b10110:
                 // set control signals and pass function for "mov r1 r2" r1=r2
+                break;
             case 0b10111:
                 // set control signals and pass function for "mov r1 L" r1[52:63] = L
+                break;
             case 0b11000:
                 // set control signals and pass function for "mov r1(L) r2" mem[r1+l] = r2
+                break;
             case 0b11001:
                 // set control signals and pass function for "addf r1 r2 r3"
+                break;
             case 0b11010:
                 // set control signals and pass function for "subf r1 r2 r3"
+                break;
             case 0b11011:
                 // set control signals and pass function for "mulf r1 r2 r3"
+                break;
             case 0b11100:
                 // set control signals and pass function for "divf r1 r2 r3"
+                break;
             case 0b11101:
                 // set control signals and pass function for "input r1 r2" r1=input[r2]
+                break;
             case 0b11110:
                 // set control signals and pass function for "out r1 r2" output[r1]=r2
                 break;
@@ -696,26 +696,18 @@ public:
 
     // Function for reacting to the clock signal
     void OnClockSignal() {
-        outputLatch->setValue(outputVal);
+        PerformFunction();
     }
 
 
-    // Function for connecting the output latches
-    void connectOutputLatches(Port* latch) {
-        outputLatch = latch;
-    }
-
-    // Function for connecting input ports
-    void ConnectInputPorts(int id, Port* port) {
-        inputPorts[id] = port;
-    }
+public:
+    Port* inputPorts[1];
+    Port* outputLatches[1];
 
 private:
     double area;
     double power;
     double numCycles;
-    Port* inputPorts[4];
-    Port* outputLatches[1];
     long long outputVal;
 };
 
@@ -791,6 +783,10 @@ public:
     void PerformFunction() {
     }
 
+    // Function for reacting to the clock signal
+    void OnClockSignal() {
+    }
+
     // Function for reacting to control signals
     void OnControlSignal(int signal) {
         int address1;
@@ -819,10 +815,6 @@ public:
         }
     }
 
-    // Function for reacting to the clock signal
-    void OnClockSignal(int signal) {
-    }
-
     // Function for connecting the output latches
     void connectOutputLatches(int id, Port* latch) {
         outputLatches[id] = latch;
@@ -843,7 +835,6 @@ private:
     std::vector<Register> registers;
     long long value1;
     long long value2;
-
 };
 
 
@@ -858,6 +849,10 @@ public:
         this->numCycles = 1;
         for (int i = 0; i < 32; i++) {
             registers.push_back(Register(200, 0.05, 0.5));
+        }
+        for (int i = 0; i < 4; i++) {
+            inputPorts[i] = new Port();
+            outputLatches[i] = new Port();
         }
     }
 
@@ -953,16 +948,6 @@ public:
             case 3:
                 break;
         }
-    }
-
-    // Function for connecting the output latches
-    void connectOutputLatches(int id, Port* latch) {
-        outputLatches[id] = latch;
-    }
-
-    // Function for connecting input ports
-    void ConnectInputPorts(int id, Port* port) {
-        inputPorts[id] = port;
     }
 
 
