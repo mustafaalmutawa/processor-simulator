@@ -33,7 +33,7 @@ void InstructionFetch() {
     result.reg3 = (instruction >> 12) & 0x1F;    // Extracting the third register specifier
     result.literal = instruction & 0xFFF;        // Extracting the 12-bit literal
 
-    
+
 }
 
 /**
@@ -85,11 +85,11 @@ public:
 public:
     Port* inputPorts[2];
     Port* outputLatches[1];
-
-private:
     double area;
     double power;
     double numCycles;
+
+private:
     long long outputVal;
 };
 
@@ -136,11 +136,11 @@ public:
 public:
     Port* inputPorts[2];
     Port* outputLatches[1];
-
-private:
+    double numCycles;
     double area;
     double power;
-    double numCycles;
+
+private:
     int shiftDirection; // 0 -> right shift, 1 -> left shift
     long long outputVal;
 };
@@ -176,11 +176,11 @@ public:
 public:
     Port* inputPorts[2];
     Port* outputLatches[1];
-
-private:
     double area;
     double power;
     double numCycles;
+
+private:
     long long outputVal;
 };
 
@@ -214,11 +214,11 @@ public:
 public:
     Port* inputPorts[2];
     Port* outputLatches[1];
-
-private:
     double area;
     double power;
     double numCycles;
+
+private:
     long long outputVal;
 };
 
@@ -273,11 +273,11 @@ public:
 public:
     Port* inputPorts[2];
     Port* outputLatches[1];
-
-private:
     double area;
     double power;
     double numCycles;
+
+private:
     int logicalFunction; // 0 -> NOT, 1 -> AND, 2 -> OR, 3 -> XOR
     long long outputVal;
 
@@ -313,11 +313,11 @@ public:
 public:
     Port* inputPorts[2];
     Port* outputLatches[1];
-
-private:
     double area;
     double power;
     double numCycles;
+
+private:
     long long outputVal;
 };
 
@@ -354,11 +354,11 @@ public:
 public:
     Port* inputPorts[1];
     Port* outputLatches[1];
-
-private:
     double area;
     double power;
     double numCycles;
+
+private:
     long long outputVal;
 };
 
@@ -411,11 +411,11 @@ public:
 public:
     Port* inputPorts[4];
     Port* outputLatches[1];
-
-private:
     double area;
     double power;
     double numCycles;
+
+private:
     long long outputVal;
 };
 
@@ -466,11 +466,11 @@ public:
 public:
     Port* inputPorts[1];
     Port* outputLatches[4];
-
-private:
     double area;
     double power;
     double numCycles;
+
+private:
     long long outputVal;
 };
 
@@ -509,11 +509,10 @@ public:
 public:
     Port* inputPorts[1];
     Port* outputLatches[1];
-
-private:
     double area;
     double power;
     double numCycles;
+private:
     int outputVal;
 };
 
@@ -557,10 +556,12 @@ public:
         inputPort = port;
     }
 
-private:
+public:
     double area;
     double power;
     double numCycles;
+
+private:
     long long value;
     Port* inputPort;
     Port* outputLatch;
@@ -633,11 +634,11 @@ public:
 public:
     Port* inputPorts[2];
     Port* outputLatches[2];
-
-private:
     double area;
     double power;
     double numCycles;
+
+private:
     std::vector<Register> registers;
     long long value1;
     long long value2;
@@ -760,11 +761,11 @@ public:
 public:
     Port* inputPorts[4];
     Port* outputLatches[4];
-
-private:
     double area;
     double power;
     double numCycles;
+
+private:
     std::vector<Register> registers;
 };
 
@@ -774,11 +775,22 @@ public:
     InstructionExecute() {
     }
 
-    // void setRegisters() {
-    //     // write value 4 in the register 1
-    //     registerFile.inputPorts[0]->setValue(4);
-    //     registerFile.inputPorts[1]->setValue(1);
-    //     registerFile.OnControlSignal(3);
+    void decreaseCycles(int cycles) {
+        MULT_CYCLES -= cycles;
+        DIV_CYCLES -= cycles;
+
+    }
+
+    void addCycles(int cycles) {
+        TOTAL_CYCLES += cycles
+
+    }
+
+    void setRegisters() {
+        // write value 4 in the register 1
+        registerFile.inputPorts[0]->setValue(4);
+        registerFile.inputPorts[1]->setValue(1);
+        registerFile.OnControlSignal(3);
 
     //     // write value 3 in the register 2
     //     registerFile.inputPorts[0]->setValue(3);
@@ -806,6 +818,7 @@ public:
 
         // send clock signal to read registers
         registerFile.OnControlSignal(2);
+        addCycles(registerFile.numCycles);
 
         // connect register file output latches to adder input ports
         addr.inputPorts[0] = registerFile.outputLatches[0];
@@ -818,9 +831,11 @@ public:
 
         // send clock signal to perform addition
         addr.OnClockSignal();
+        addCycles(addr.numCycles);
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
+        addCycles(registerFile.numCycles);
     }
 
     // instruction 0x1
@@ -830,6 +845,7 @@ public:
 
         // send clock signal to read register
         registerFile.OnControlSignal(1);
+        addCycles(registerFile.numCycles);
 
         // connect register file output latches to adder input ports
         addr.inputPorts[0] = registerFile.outputLatches[0];
@@ -842,9 +858,11 @@ public:
 
         // send clock signal to perform addition
         addr.OnClockSignal();
+        addCycles(addr.numCycles);
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
+        addCycles(registerFile.numCycles);
     }
 
     // instruction 0x2
@@ -855,6 +873,7 @@ public:
 
         // send clock signal to read registers
         registerFile.OnControlSignal(2);
+        addCycles(registerFile.numCycles);
 
         // connect register file output latches to adder input ports
         addr.inputPorts[0] = registerFile.outputLatches[0];
@@ -868,9 +887,11 @@ public:
 
         // send clock signal to perform addition
         addr.OnClockSignal();
+        addCycles(addr.numCycles);
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
+        addCycles(registerFile.numCycles);
     }
 
 
@@ -881,6 +902,7 @@ public:
 
         // send clock signal to read registers
         registerFile.OnControlSignal(1);
+        addCycles(registerFile.numCycles);
 
         // connect register file output latches to adder input ports
         addr.inputPorts[0] = registerFile.outputLatches[0];
@@ -893,9 +915,11 @@ public:
 
         // send clock signal to perform addition
         addr.OnClockSignal();
+        addCycles(addr.numCycles);
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
+        addCycles(registerFile.numCycles);
     }
 
      // instruction 0x4
@@ -906,6 +930,7 @@ public:
 
         // send clock signal to read registers
         registerFile.OnControlSignal(2);
+        addCycles(registerFile.numCycles);
 
         // connect register file output latches to adder input ports
         multiplier.inputPorts[0] = registerFile.outputLatches[0];
@@ -918,9 +943,11 @@ public:
 
         // send clock signal to perform addition
         multiplier.OnClockSignal();
+        addCycles(multiplier.numCycles);
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
+        addCycles(registerFile.numCycles);
     }
 
 
@@ -932,6 +959,7 @@ public:
 
         // send clock signal to read registers
         registerFile.OnControlSignal(2);
+        addCycles(registerFile.numCycles);
 
         // connect register file output latches to adder input ports
         divider.inputPorts[0] = registerFile.outputLatches[0];
@@ -944,9 +972,11 @@ public:
 
         // send clock signal to perform addition
         divider.OnClockSignal();
+        addCycles(divider.numCycles);
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
+        addCycles(registerFile.numCycles);
     }
 
 
@@ -958,6 +988,7 @@ public:
 
         // send clock signal to read registers
         registerFile.OnControlSignal(2);
+        addCycles(registerFile.numCycles);
 
         // connect register file output latches to adder input ports
         logic.inputPorts[0] = registerFile.outputLatches[0];
@@ -971,9 +1002,11 @@ public:
         // send clock signal to perform addition
         logic.OnControlSignal(1);
         logic.OnClockSignal();
+        addCycles(logic.numCycles);
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
+        addCycles(registerFile.numCycles);
     }
 
 
@@ -985,6 +1018,7 @@ public:
 
         // send clock signal to read registers
         registerFile.OnControlSignal(2);
+        addCycles(registerFile.numCycles);
 
         // connect register file output latches to adder input ports
         logic.inputPorts[0] = registerFile.outputLatches[0];
@@ -998,9 +1032,11 @@ public:
         // send clock signal to perform addition
         logic.OnControlSignal(2);
         logic.OnClockSignal();
+        addCycles(logic.numCycles);
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
+        addCycles(registerFile.numCycles);
     }
 
     // instruction 0x8 logical xor
@@ -1011,6 +1047,7 @@ public:
 
         // send clock signal to read registers
         registerFile.OnControlSignal(2);
+        addCycles(registerFile.numCycles);
 
         // connect register file output latches to adder input ports
         logic.inputPorts[0] = registerFile.outputLatches[0];
@@ -1024,9 +1061,11 @@ public:
         // send clock signal to perform addition
         logic.OnControlSignal(3);
         logic.OnClockSignal();
+        addCycles(logic.numCycles);
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
+        addCycles(registerFile.numCycles);
     }
 
 
@@ -1037,6 +1076,7 @@ public:
 
         // send clock signal to read registers
         registerFile.OnControlSignal(1);
+        addCycles(registerFile.numCycles);
 
         // connect register file output latches to adder input ports
         logic.inputPorts[0] = registerFile.outputLatches[0];
@@ -1049,9 +1089,11 @@ public:
         // send clock signal to perform addition
         logic.OnControlSignal(0);
         logic.OnClockSignal();
+        addCycles(logic.numCycles);
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
+        addCycles(registerFile.numCycles);
     }
 
 
@@ -1063,6 +1105,7 @@ public:
 
         // send clock signal to read registers
         registerFile.OnControlSignal(2);
+        addCycles(registerFile.numCycles);
 
         // connect register file output latches to adder input ports
         shifter.inputPorts[0] = registerFile.outputLatches[0];
@@ -1076,9 +1119,11 @@ public:
         // send clock signal to perform addition
         shifter.OnControlSignal(0);
         shifter.OnClockSignal();
+        addCycles(shifter.numCycles);
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
+        addCycles(registerFile.numCycles);
     }
 
 
@@ -1089,6 +1134,7 @@ public:
 
         // send clock signal to read registers
         registerFile.OnControlSignal(1);
+        addCycles(registerFile.numCycles);
 
         // connect register file output latches to adder input ports
         shifter.inputPorts[0] = registerFile.outputLatches[0];
@@ -1102,9 +1148,11 @@ public:
         // send clock signal to perform addition
         shifter.OnControlSignal(0);
         shifter.OnClockSignal();
+        addCycles(shifter.numCycles);
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
+        addCycles(registerFile.numCycles);
     }
 
 
@@ -1116,6 +1164,7 @@ public:
 
         // send clock signal to read registers
         registerFile.OnControlSignal(2);
+        addCycles(registerFile.numCycles);
 
         // connect register file output latches to adder input ports
         shifter.inputPorts[0] = registerFile.outputLatches[0];
@@ -1129,9 +1178,11 @@ public:
         // send clock signal to perform addition
         shifter.OnControlSignal(1);
         shifter.OnClockSignal();
+        addCycles(shifter.numCycles);
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
+        addCycles(registerFile.numCycles);
     }
 
 
@@ -1142,6 +1193,7 @@ public:
 
         // send clock signal to read registers
         registerFile.OnControlSignal(1);
+        addCycles(registerFile.numCycles);
 
         // connect register file output latches to adder input ports
         shifter.inputPorts[0] = registerFile.outputLatches[0];
@@ -1155,19 +1207,35 @@ public:
         // send clock signal to perform addition
         shifter.OnControlSignal(1);
         shifter.OnClockSignal();
+        addCycles(shifter.numCycles);
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
+        addCycles(registerFile.numCycles);
     }
+
+
 
 
     // instruction 0x0e br rd
     void Instruction0x0e(int register_d) {
+
+         // This is a buffer cycle that we have to go through, because we pass by the register the first time
+        addCycles(1);
+
+
         // set the input ports for the register file
         registerFile.inputPorts[0]->setValue(register_d);
 
+        // This is a buffer cycle that we have to go through, because we pass by the ALU
+        addCycles(1);
+
         // send clock signal to read registers
         registerFile.OnControlSignal(1);
+        addCycles(registerFile.numCycles);
+
+
+
         // need to initialise PC
         // connect addr output latch to register file 1st input port
         PC = registerFile.outputLatches[0]->getValue();
@@ -1176,11 +1244,19 @@ public:
 
     // instruction 0x0f brr rd
     void Instruction0x0f(int register_d) {
+
+        // This is a buffer cycle that we have to go through, because we pass by the register the first time
+        addCycles(1);
+
         // set the input ports for the register file
         registerFile.inputPorts[0]->setValue(register_d);
 
+        // This is a buffer cycle that we have to go through, because we pass by the ALU
+        addCycles(1);
+
         // send clock signal to read registers
         registerFile.OnControlSignal(1);
+        addCycles(registerFile.numCycles);
 
 
 
@@ -1192,6 +1268,16 @@ public:
 
     // instruction 0x10 brr L
     void Instruction0x10(int immediate) {
+        // This is a buffer cycle that we have to go through, because we pass by the register the first time
+        addCycles(1);
+
+        // This is a buffer cycle that we have to go through, because we pass by the ALU
+        addCycles(1);
+
+        // This is a buffer cycle that we have to go through, because we pass by the regiser the second time
+        addCycles(1);
+
+
         PC += immediate;
     }
 
@@ -1200,8 +1286,14 @@ public:
         // set the input ports for the register file
         registerFile.inputPorts[0]->setValue(register_s);
 
+
+
         // send clock signal to read registers
         registerFile.OnControlSignal(1);
+        addCycles(registerFile.numCycles);
+
+        // This is a buffer cycle that we have to go through, because we pass by the ALU
+        addCycles(1);
 
         if (registerFile.outputLatches[0] == 0) {
             PC += 4;
@@ -1211,8 +1303,12 @@ public:
             // set value for register file 2nd input port
             registerFile.inputPorts[1]->setValue(register_d);
         }
+
+
+
         // send clock signal for write
         registerFile.OnControlSignal(3);
+        addCycles(registerFile.numCycles);
     }
 
     // instruction 0x14 brgt rd, rs,, rt
@@ -1223,6 +1319,10 @@ public:
 
         // send clock signal to read registers
         registerFile.OnControlSignal(2);
+        addCycles(registerFile.numCycles);
+
+        // This is a buffer cycle that we have to go through, because we pass by the ALU
+        addCycles(1);
 
         if (registerFile.outputLatches[0] <= registerFile.outputLatches[1]) {
             PC += 4;
@@ -1234,6 +1334,7 @@ public:
         }
         // send clock signal for write
         registerFile.OnControlSignal(3);
+        addCycles(registerFile.numCycles);
     }
 
     // instruction 0x15 mov
@@ -1243,14 +1344,20 @@ public:
 
         // send clock signal to read registers
         registerFile.OnControlSignal(1);
+        addCycles(registerFile.numCycles);
+
+        // This is a buffer cycle that we have to go through because we pass by the ALU
+        addCycles(1);
 
         // connect addr output latch to register file 1st input port
         registerFile.inputPorts[0] = registerFile.outputLatches[0] + immediate;
         // set value for register file 2nd input port
         registerFile.inputPorts[1]->setValue(register_d);
 
+
         // send clock signal for write
         registerFile.OnControlSignal(3);
+        addCycles(registerFile.numCycles);
     }
 
     // instruction 0x16 mov
@@ -1260,26 +1367,43 @@ public:
 
         // send clock signal to read registers
         registerFile.OnControlSignal(1);
+        addCycles(registerFile.numCycles);
+
+        // This is a buffer cycle that we have to go through because we pass by the ALU
+        addCycles(1);
 
         // connect addr output latch to register file 1st input port
         registerFile.inputPorts[0] = registerFile.outputLatches[0];
         // set value for register file 2nd input port
         registerFile.inputPorts[1]->setValue(register_d);
 
+
+
         // send clock signal for write
         registerFile.OnControlSignal(3);
+        addCycles(registerFile.numCycles);
     }
 
     // instruction 0x17 mov rd, L
     void Instruction0x17(int register_d, int register_s, int immediate) {
+
+        // This is a buffer cycle that we have to go through, because we pass by the register the first time
+        addCycles(1);
 
         // connect addr output latch to register file 1st input port
         registerFile.inputPorts[0]->setValue(immediate);
         // set value for register file 2nd input port
         registerFile.inputPorts[1]->setValue(register_d);
 
+
+
+        // This is a buffer cycle that we have to go through, because we pass by the ALU
+        addCycles(1);
+
         // send clock signal for write
         registerFile.OnControlSignal(3);
+        addCycles(registerFile.numCycles);
+
     }
 
     // instruction 0x18 mov (rd)(L), rs
@@ -1289,14 +1413,18 @@ public:
 
         // send clock signal to read registers
         registerFile.OnControlSignal(1);
+        addCycles(registerFile.numCycles);
 
         // connect addr output latch to register file 1st input port
         registerFile.inputPorts[0] = registerFile.outputLatches[0];
         // set value for register file 2nd input port
         registerFile.inputPorts[1]->setValue(register_d + immediate);
+        // This is a buffer cycle that we have to go through, because we pass by the ALU
+        addCycles(1);
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
+        addCycles(registerFile.numCycles);
     }
 
     // instruction 0x1f Halt
