@@ -314,6 +314,7 @@ private:
 
 };
 
+
 /**
  * Logic Device (under construction)
  */
@@ -524,6 +525,7 @@ private:
 
 };
 
+
 /**
  * Register File
  */
@@ -612,19 +614,18 @@ private:
 
 };
 
-
-
-
-
 /**
- * Multiplexer Device
+ * Multi Ported Register File
  */
-class Multiplexer : public Device {
+class MultiPortedRegisterFile : public Device {
 public:
-    Multiplexer() {
-        this->area = 500;
-        this->power = 0.25;
-        this->numCycles = 0.5;
+    MultiPortedRegisterFile() {
+        this->area = 25000;
+        this->power = 6;
+        this->numCycles = 1;
+        for (int i = 0; i < 32; i++) {
+            registers.push_back(Register(200, 0.05, 0.5));
+        }
     }
 
     // Function for performing the device's main function
@@ -633,34 +634,100 @@ public:
 
     // Function for reacting to the clock signal
     void OnClockSignal() {
-        (*outputLatch).setValue(outputVal);
     }
 
     // Function for reacting to control signals
     void OnControlSignal(int signal) {
+        int address1;
+        int address2;
+        int address3;
+        int address4;
+        switch (signal) {
+            case 0: // 0x00 NOP
+                break;
+            case 1: // 0x01 R
+                address1 = inputPorts[0]->getValue();
+                registers[address1].connectOutputLatches(outputLatches[0]);
+                registers[address1].OnControlSignal(0);
+                break;
+            case 2: // 0x10 RR
+                address1 = inputPorts[0]->getValue();
+                address2 = inputPorts[1]->getValue();
+                registers[address1].connectOutputLatches(outputLatches[0]);
+                registers[address2].connectOutputLatches(outputLatches[1]);
+                registers[address1].OnControlSignal(0);
+                registers[address2].OnControlSignal(0);
+                break;
+            case 3: // 0x11 W
+                address1 = inputPorts[1]->getValue();
+                registers[address1].ConnectInputPorts(inputPorts[0]);
+                registers[address1].OnControlSignal(1);
+                break;
+            case 4: // 0x100 RRR
+                // 3 reads
+                address1 = inputPorts[0]->getValue();
+                address2 = inputPorts[1]->getValue();
+                address3 = inputPorts[2]->getValue();
+                registers[address1].connectOutputLatches(outputLatches[0]);
+                registers[address2].connectOutputLatches(outputLatches[1]);
+                registers[address3].connectOutputLatches(outputLatches[3]);
+                registers[address1].OnControlSignal(0);
+                registers[address2].OnControlSignal(0);
+                registers[address3].OnControlSignal(0);
+                break;
+            case 5: // 0x101 RRRR
+                // 4 reads
+                address1 = inputPorts[0]->getValue();
+                address2 = inputPorts[1]->getValue();
+                address3 = inputPorts[2]->getValue();
+                registers[address1].connectOutputLatches(outputLatches[0]);
+                registers[address2].connectOutputLatches(outputLatches[1]);
+                registers[address3].connectOutputLatches(outputLatches[3]);
+                registers[address1].OnControlSignal(0);
+                registers[address2].OnControlSignal(0);
+                registers[address3].OnControlSignal(0);
+                break;
+            case 6: // 0x110 RRW
+                // 2 reads
+                address1 = inputPorts[0]->getValue();
+                address2 = inputPorts[1]->getValue();
+                registers[address1].connectOutputLatches(outputLatches[0]);
+                registers[address2].connectOutputLatches(outputLatches[1]);
+                registers[address1].OnControlSignal(0);
+                registers[address2].OnControlSignal(0);
+                // 1 write
+                address3 = inputPorts[3]->getValue();
+                registers[address1].ConnectInputPorts(inputPorts[2]);
+                registers[address1].OnControlSignal(1);
+                break;
+            case 7: // 0x111 WW
+                // Perform first write
+                address1 = inputPorts[1]->getValue();
+                registers[address1].ConnectInputPorts(inputPorts[0]);
+                registers[address1].OnControlSignal(1);
+                // Perform second write
+                address2 = inputPorts[3]->getValue();
+                registers[address1].ConnectInputPorts(inputPorts[2]);
+                registers[address1].OnControlSignal(1);
+        }
+    }
+    void OnClockSignal(int signal) {
         switch (signal) {
             case 0:
-                outputVal = (inputPorts[0]->getValue());
-
                 break;
             case 1:
-                outputVal = (inputPorts[1]->getValue());
-
                 break;
             case 2:
-                outputVal = (inputPorts[2]->getValue());
                 break;
             case 3:
-                outputVal = (inputPorts[3]->getValue());
                 break;
         }
     }
 
     // Function for connecting the output latches
-    void connectOutputLatches(Port* latch) {
-        outputLatch = latch;
+    void connectOutputLatches(int id, Port* latch) {
+        outputLatches[id] = latch;
     }
-
     // Function for connecting input ports
     void ConnectInputPorts(int id, Port* port) {
         inputPorts[id] = port;
@@ -670,72 +737,17 @@ private:
     double area;
     double power;
     double numCycles;
+    std::vector<Register> registers;
+    long long value;
+    int* port;
     Port* inputPorts[4];
-    Port* outputLatch; // the latch is defined with port class because it serves the same functionality
-    long long outputVal;
+    Port* outputLatches[4];
+    int* outputLatch;
+    int* outputLatch2;
+    long long value1;
+    long long value2;
 
 };
-
-/**
- * Demultiplexer Device
- */
-class Demultiplexer : public Device {
-public:
-    Demultiplexer() {
-        this->area = 500;
-        this->power = 0.25;
-        this->numCycles = 0.5;
-    }
-
-    // Function for performing the device's main function
-    void PerformFunction() {
-    }
-
-    // Function for reacting to the clock signal
-    void OnClockSignal() {
-    }
-
-    // Function for reacting to control signals
-    void OnControlSignal(int signal) {
-        long long inputVal = (inputPort->getValue());
-        switch (signal) {
-            case 0:
-                outputLatch[0]->setValue(inputVal);
-
-                break;
-            case 1:
-                outputLatch[1]->setValue(inputVal);
-
-                break;
-            case 2:
-                outputLatch[2]->setValue(inputVal);
-                break;
-            case 3:
-                outputLatch[3]->setValue(inputVal);
-                break;
-        }
-    }
-
-    // Function for connecting the output latches
-    void connectOutputLatches(int id, Port* latch) {
-        outputLatch[id] = latch;
-    }
-
-    // Function for connecting input ports
-    void ConnectInputPorts(Port* port) {
-        inputPort = port;
-    }
-
-private:
-    double area;
-    double power;
-    double numCycles;
-    Port* inputPort;
-    Port* outputLatch[4]; // the latch is defined with port class because it serves the same functionality
-    long long outputVal;
-
-};
-
 
 
 class Processor {
