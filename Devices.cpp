@@ -4,6 +4,8 @@
 
 #include "AbstractDevice.h"
 
+long long PC = 0;
+
 
 struct Instruction {
     uint32_t opcode;
@@ -25,6 +27,7 @@ Instruction decodeInstruction(uint32_t instruction) {
     switch(result.opcode){
         case 0b00000:
             // set control signals and pass function for "add r1 r2 r3"
+
             break;
         case 0b00001:
             // set control signals and pass function for "addi r1 L"
@@ -53,17 +56,17 @@ Instruction decodeInstruction(uint32_t instruction) {
         case 0b01101:
             // set control signals and pass function for "shftli r1 L"
         case 0b01110:
-            // set control signals and pass function for "br r1" pc=r1
+            // set control signals and pass function for "br r1" PC=r1
         case 0b01111:
-            // set control signals and pass function for "brr r1" pc = pc + 1
+            // set control signals and pass function for "brr r1" PC = PC + 1
         case 0b10000:
-            // set control signals and pass function for "brr L" pc = pc + L
+            // set control signals and pass function for "brr L" PC = PC + L
         case 0b10001:
-            // set control signals and pass function for "brnz r1 r2" pc = (r2==0)? pc+4 : r1
+            // set control signals and pass function for "brnz r1 r2" PC = (r2==0)? PC+4 : r1
         case 0b10010:
-            // set control signals and pass function for "call r1" mem[r31-8]= pc+4 also pc= r1
+            // set control signals and pass function for "call r1" mem[r31-8]= PC+4 also PC= r1
         case 0b10011:
-            // set control signals and pass function for "return" pc= mem[r31-8]
+            // set control signals and pass function for "return" PC= mem[r31-8]
         case 0b10100:
             // set control signals and pass function for "halt"
         case 0b10101:
@@ -169,6 +172,7 @@ public:
         std::cout << "port1 value: " << inputPorts[0]->getValue() << std::endl;
         std::cout << "port2 value: " << inputPorts[1]->getValue() << std::endl;
         if (shiftDirection == 0) {
+            // shiftr if 0
             outputVal = inputPorts[0]->getValue() >> inputPorts[1]->getValue();
         }
         else {
@@ -520,7 +524,7 @@ public:
 
 public:
     Port* inputPorts[1];
-    Port* outputLatches[4]; 
+    Port* outputLatches[4];
 
 private:
     double area;
@@ -641,22 +645,22 @@ public:
                 // set control signals and pass function for "shftli r1 L"
                 break;
             case 0b01110:
-                // set control signals and pass function for "br r1" pc=r1
+                // set control signals and pass function for "br r1" PC=r1
                 break;
             case 0b01111:
-                // set control signals and pass function for "brr r1" pc = pc + 1
+                // set control signals and pass function for "brr r1" PC = PC + 1
                 break;
             case 0b10000:
-                // set control signals and pass function for "brr L" pc = pc + L
+                // set control signals and pass function for "brr L" PC = PC + L
                 break;
             case 0b10001:
-                // set control signals and pass function for "brnz r1 r2" pc = (r2==0)? pc+4 : r1
+                // set control signals and pass function for "brnz r1 r2" PC = (r2==0)? PC+4 : r1
                 break;
             case 0b10010:
-                // set control signals and pass function for "call r1" mem[r31-8]= pc+4 also pc= r1
+                // set control signals and pass function for "call r1" mem[r31-8]= PC+4 also PC= r1
                 break;
             case 0b10011:
-                // set control signals and pass function for "return" pc= mem[r31-8]
+                // set control signals and pass function for "return" PC= mem[r31-8]
                 break;
             case 0b10100:
                 // set control signals and pass function for "halt"
@@ -1016,6 +1020,475 @@ public:
         // send clock signal for write
         registerFile.OnControlSignal(3);
     }
+
+    // instruction 0x1
+    void Instruction0x1(int register_d, int register_s, int immediate) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_s);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(1);
+
+        // connect register file output latches to adder input ports
+        addr.inputPorts[0] = registerFile.outputLatches[0];
+        addr.inputPorts[1]->setValue(immediate);
+
+        // connect addr output latch to register file 1st input port
+        registerFile.inputPorts[0] = addr.outputLatches[0];
+        // set value for register file 2nd input port
+        registerFile.inputPorts[1]->setValue(register_d);
+
+        // send clock signal to perform addition
+        addr.OnClockSignal();
+
+        // send clock signal for write
+        registerFile.OnControlSignal(3);
+    }
+
+    // instruction 0x2
+    void Instruction0x2(int register_d, int register_s, int register_t) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_s);
+        registerFile.inputPorts[1]->setValue(register_t);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(2);
+
+        // connect register file output latches to adder input ports
+        addr.inputPorts[0] = registerFile.outputLatches[0];
+        long long temp = registerFile.outputLatches[1]->getValue(); // this is for the two's comp to do sub
+        addr.inputPorts[1]->setValue(-temp);
+
+        // connect addr output latch to register file 1st input port
+        registerFile.inputPorts[0] = addr.outputLatches[0];
+        // set value for register file 2nd input port
+        registerFile.inputPorts[1]->setValue(register_d);
+
+        // send clock signal to perform addition
+        addr.OnClockSignal();
+
+        // send clock signal for write
+        registerFile.OnControlSignal(3);
+    }
+
+
+    // instruction 0x3
+    void Instruction0x3(int register_d, int register_s, int immediate) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_s);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(1);
+
+        // connect register file output latches to adder input ports
+        addr.inputPorts[0] = registerFile.outputLatches[0];
+        addr.inputPorts[1]->setValue(-immediate);
+
+        // connect addr output latch to register file 1st input port
+        registerFile.inputPorts[0] = addr.outputLatches[0];
+        // set value for register file 2nd input port
+        registerFile.inputPorts[1]->setValue(register_d);
+
+        // send clock signal to perform addition
+        addr.OnClockSignal();
+
+        // send clock signal for write
+        registerFile.OnControlSignal(3);
+    }
+
+     // instruction 0x4
+    void Instruction0x4(int register_d, int register_s, int register_t) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_s);
+        registerFile.inputPorts[1]->setValue(register_t);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(2);
+
+        // connect register file output latches to adder input ports
+        Multiplier.inputPorts[0] = registerFile.outputLatches[0];
+        Multiplier.inputPorts[1] = registerFile.outputLatches[1];
+
+        // connect addr output latch to register file 1st input port
+        registerFile.inputPorts[0] = Multiplier.outputLatches[0];
+        // set value for register file 2nd input port
+        registerFile.inputPorts[1]->setValue(register_d);
+
+        // send clock signal to perform addition
+        Multiplier.OnClockSignal();
+
+        // send clock signal for write
+        registerFile.OnControlSignal(3);
+    }
+
+
+     // instruction 0x5
+    void Instruction0x5(int register_d, int register_s, int register_t) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_s);
+        registerFile.inputPorts[1]->setValue(register_t);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(2);
+
+        // connect register file output latches to adder input ports
+        Divider.inputPorts[0] = registerFile.outputLatches[0];
+        Divider.inputPorts[1] = registerFile.outputLatches[1];
+
+        // connect addr output latch to register file 1st input port
+        registerFile.inputPorts[0] = Divider.outputLatches[0];
+        // set value for register file 2nd input port
+        registerFile.inputPorts[1]->setValue(register_d);
+
+        // send clock signal to perform addition
+        Divider.OnClockSignal();
+
+        // send clock signal for write
+        registerFile.OnControlSignal(3);
+    }
+
+
+    // instruction 0x6 logical and
+    void Instruction0x6(int register_d, int register_s, int register_t) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_s);
+        registerFile.inputPorts[1]->setValue(register_t);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(2);
+
+        // connect register file output latches to adder input ports
+        Logic.inputPorts[0] = registerFile.outputLatches[0];
+        Logic.inputPorts[1] = registerFile.outputLatches[1];
+
+        // connect addr output latch to register file 1st input port
+        registerFile.inputPorts[0] = Logic.outputLatches[0];
+        // set value for register file 2nd input port
+        registerFile.inputPorts[1]->setValue(register_d);
+
+        // send clock signal to perform addition
+        Logic.OnControlSignal(1);
+        Logic.OnClockSignal();
+
+        // send clock signal for write
+        registerFile.OnControlSignal(3);
+    }
+
+
+    // instruction 0x7 logical or
+    void Instruction0x7(int register_d, int register_s, int register_t) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_s);
+        registerFile.inputPorts[1]->setValue(register_t);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(2);
+
+        // connect register file output latches to adder input ports
+        Logic.inputPorts[0] = registerFile.outputLatches[0];
+        Logic.inputPorts[1] = registerFile.outputLatches[1];
+
+        // connect addr output latch to register file 1st input port
+        registerFile.inputPorts[0] = Logic.outputLatches[0];
+        // set value for register file 2nd input port
+        registerFile.inputPorts[1]->setValue(register_d);
+
+        // send clock signal to perform addition
+        Logic.OnControlSignal(2);
+        Logic.OnClockSignal();
+
+        // send clock signal for write
+        registerFile.OnControlSignal(3);
+    }
+
+    // instruction 0x8 logical xor
+    void Instruction0x8(int register_d, int register_s, int register_t) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_s);
+        registerFile.inputPorts[1]->setValue(register_t);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(2);
+
+        // connect register file output latches to adder input ports
+        Logic.inputPorts[0] = registerFile.outputLatches[0];
+        Logic.inputPorts[1] = registerFile.outputLatches[1];
+
+        // connect addr output latch to register file 1st input port
+        registerFile.inputPorts[0] = Logic.outputLatches[0];
+        // set value for register file 2nd input port
+        registerFile.inputPorts[1]->setValue(register_d);
+
+        // send clock signal to perform addition
+        Logic.OnControlSignal(3);
+        Logic.OnClockSignal();
+
+        // send clock signal for write
+        registerFile.OnControlSignal(3);
+    }
+
+
+    // instruction 0x9 logical not
+    void Instruction0x9(int register_d, int register_s, int register_t) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_s);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(1);
+
+        // connect register file output latches to adder input ports
+        Logic.inputPorts[0] = registerFile.outputLatches[0];
+
+        // connect addr output latch to register file 1st input port
+        registerFile.inputPorts[0] = Logic.outputLatches[0];
+        // set value for register file 2nd input port
+        registerFile.inputPorts[1]->setValue(register_d);
+
+        // send clock signal to perform addition
+        Logic.OnControlSignal(0);
+        Logic.OnClockSignal();
+
+        // send clock signal for write
+        registerFile.OnControlSignal(3);
+    }
+
+
+    // instruction 0xa shiftr
+    void Instruction0xa(int register_d, int register_s, int register_t) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_s);
+        registerFile.inputPorts[1]->setValue(register_t);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(2);
+
+        // connect register file output latches to adder input ports
+        Shifter.inputPorts[0] = registerFile.outputLatches[0];
+        Shifter.inputPorts[1] = registerFile.outputLatches[1];
+
+        // connect addr output latch to register file 1st input port
+        registerFile.inputPorts[0] = Shifter.outputLatches[0];
+        // set value for register file 2nd input port
+        registerFile.inputPorts[1]->setValue(register_d);
+
+        // send clock signal to perform addition
+        Shifter.OnControlSignal(0);
+        Shifter.OnClockSignal();
+
+        // send clock signal for write
+        registerFile.OnControlSignal(3);
+    }
+
+
+    // instruction 0xb shiftri
+    void Instruction0xb(int register_d, int register_s, int immediate) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_s);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(1);
+
+        // connect register file output latches to adder input ports
+        Shifter.inputPorts[0] = registerFile.outputLatches[0];
+        Shifter.inputPorts[1]->setValue(immediate);
+
+        // connect addr output latch to register file 1st input port
+        registerFile.inputPorts[0] = Shifter.outputLatches[0];
+        // set value for register file 2nd input port
+        registerFile.inputPorts[1]->setValue(register_d);
+
+        // send clock signal to perform addition
+        Shifter.OnControlSignal(0);
+        Shifter.OnClockSignal();
+
+        // send clock signal for write
+        registerFile.OnControlSignal(3);
+    }
+
+
+    // instruction 0xc shiftl
+    void Instruction0xc(int register_d, int register_s, int register_t) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_s);
+        registerFile.inputPorts[1]->setValue(register_t);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(2);
+
+        // connect register file output latches to adder input ports
+        Shifter.inputPorts[0] = registerFile.outputLatches[0];
+        Shifter.inputPorts[1] = registerFile.outputLatches[1];
+
+        // connect addr output latch to register file 1st input port
+        registerFile.inputPorts[0] = Shifter.outputLatches[0];
+        // set value for register file 2nd input port
+        registerFile.inputPorts[1]->setValue(register_d);
+
+        // send clock signal to perform addition
+        Shifter.OnControlSignal(1);
+        Shifter.OnClockSignal();
+
+        // send clock signal for write
+        registerFile.OnControlSignal(3);
+    }
+
+
+    // instruction 0xd shiftri
+    void Instruction0xd(int register_d, int register_s, int immediate) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_s);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(1);
+
+        // connect register file output latches to adder input ports
+        Shifter.inputPorts[0] = registerFile.outputLatches[0];
+        Shifter.inputPorts[1]->setValue(immediate);
+
+        // connect addr output latch to register file 1st input port
+        registerFile.inputPorts[0] = Shifter.outputLatches[0];
+        // set value for register file 2nd input port
+        registerFile.inputPorts[1]->setValue(register_d);
+
+        // send clock signal to perform addition
+        Shifter.OnControlSignal(1);
+        Shifter.OnClockSignal();
+
+        // send clock signal for write
+        registerFile.OnControlSignal(3);
+    }
+
+    // instruction 0x15 mov
+    void Instruction0x15(int register_d, int register_s, int immediate) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_s);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(1);
+
+        // connect addr output latch to register file 1st input port
+        registerFile.inputPorts[0] = registerFile.outputLatches[0] + immediate;
+        // set value for register file 2nd input port
+        registerFile.inputPorts[1]->setValue(register_d);
+
+        // send clock signal for write
+        registerFile.OnControlSignal(3);
+    }
+
+    // instruction 0x16 mov
+    void Instruction0x16(int register_d, int register_s) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_s);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(1);
+
+        // connect addr output latch to register file 1st input port
+        registerFile.inputPorts[0] = registerFile.outputLatches[0];
+        // set value for register file 2nd input port
+        registerFile.inputPorts[1]->setValue(register_d);
+
+        // send clock signal for write
+        registerFile.OnControlSignal(3);
+    }
+
+    // instruction 0x17 mov rd, L
+    void Instruction0x17(int register_d, int register_s, int immediate) {
+
+        // connect addr output latch to register file 1st input port
+        registerFile.inputPorts[0]->setValue(immediate);
+        // set value for register file 2nd input port
+        registerFile.inputPorts[1]->setValue(register_d);
+
+        // send clock signal for write
+        registerFile.OnControlSignal(3);
+    }
+
+    // instruction 0x18 mov (rd)(L), rs
+    void Instruction0x18(int register_d, int register_s, int immediate) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_s);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(1);
+
+        // connect addr output latch to register file 1st input port
+        registerFile.inputPorts[0] = registerFile.outputLatches[0];
+        // set value for register file 2nd input port
+        registerFile.inputPorts[1]->setValue(register_d + immediate);
+
+        // send clock signal for write
+        registerFile.OnControlSignal(3);
+    }
+
+
+    // instruction 0x0e br rd
+    void Instruction0x0e(int register_d) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_d);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(1);
+
+
+
+        // need to initialise PC
+        // connect addr output latch to register file 1st input port
+        PC = registerFile.outputLatches[0];
+
+    }
+
+    // instruction 0x0f brr rd
+    void Instruction0x0f(int register_d) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_d);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(1);
+
+
+
+        // need to initialise PC
+        // connect addr output latch to register file 1st input port
+        PC += registerFile.outputLatches[0];
+
+    }
+
+    // instruction 0x10 brr L
+    void Instruction0x10(int immediate) {
+        PC += immediate;
+
+    }
+
+    // instruction 0x11 brnz rd, rs
+    void Instruction0x11(int register_d, int register_s) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_s);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(1);
+
+        if (registerFile.outputLatches[0] == 0) {
+            PC += 4;
+
+        } else {
+
+            // set value for register file 2nd input port
+            registerFile.inputPorts[1]->setValue(register_d);
+
+
+        }
+
+
+        // send clock signal for write
+        registerFile.OnControlSignal(3);
+    }
+
+
+
+
+
+
 
 private:
     RegisterFile registerFile;
