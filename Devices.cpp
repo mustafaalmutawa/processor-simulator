@@ -782,32 +782,9 @@ public:
     }
 
     void addCycles(int cycles) {
-        TOTAL_CYCLES += cycles
+        TOTAL_CYCLES += cycles;
 
     }
-
-    void setRegisters() {
-        // write value 4 in the register 1
-        registerFile.inputPorts[0]->setValue(4);
-        registerFile.inputPorts[1]->setValue(1);
-        registerFile.OnControlSignal(3);
-
-    //     // write value 3 in the register 2
-    //     registerFile.inputPorts[0]->setValue(3);
-    //     registerFile.inputPorts[1]->setValue(2);
-    //     registerFile.OnControlSignal(3);
-
-    //     // read values at register 1 and 2
-    //     registerFile.inputPorts[0]->setValue(1);
-    //     registerFile.inputPorts[1]->setValue(2);
-    //     registerFile.connectOutputLatches(0, &latch1);
-    //     registerFile.connectOutputLatches(1, &latch2);
-    //     registerFile.OnControlSignal(2);
-
-    //     std::cout << "registr value: " << latch1.getValue() << std::endl;
-    //     std::cout << "registr value: " << latch2.getValue() << std::endl;
-    //     Instruction0x0(3, 1, 2);
-    // }
 
 
     // instruction 0x0
