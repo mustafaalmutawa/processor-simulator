@@ -22,7 +22,6 @@ Instruction decodeInstruction(uint32_t instruction) {
     result.reg3 = (instruction >> 12) & 0x1F;    // Extracting the third register specifier
     result.literal = instruction & 0xFFF;        // Extracting the 12-bit literal
 
-
     switch(result.opcode){
         case 0b00000:
             // set control signals and pass function for "add r1 r2 r3"
@@ -110,6 +109,7 @@ private:
     long long value;
 };
 
+
 /**
  * Adder Device
  */
@@ -119,7 +119,6 @@ public:
         this->area = 400;
         this->power = 0.5;
         this->numCycles = 1;
-
         inputPorts[0] = new Port();
         inputPorts[1] = new Port();
         outputLatches[0] = new Port();
@@ -138,23 +137,18 @@ public:
         outputLatches[0]->setValue(outputVal);
     }
 
-    // Function for reacting to control signals
-    void OnControlSignal() {
-        return;
-    }
-
 
 public:
     Port* inputPorts[2];
-    Port* outputLatches[1]; // the latch is defined with port class because it serves the same functionality
+    Port* outputLatches[1];
 
 private:
     double area;
     double power;
     double numCycles;
     long long outputVal;
-
 };
+
 
 /**
  * Shifter Device
@@ -165,11 +159,13 @@ public:
         this->area = 200;
         this->power = 0.5;
         this->numCycles = 1;
+        inputPorts[0] = new Port();
+        inputPorts[1] = new Port();
+        outputLatches[0] = new Port();
     }
 
     // Function for performing the device's main function
     void PerformFunction() {
-
         std::cout << "port1 value: " << inputPorts[0]->getValue() << std::endl;
         std::cout << "port2 value: " << inputPorts[1]->getValue() << std::endl;
         if (shiftDirection == 0) {
@@ -183,7 +179,7 @@ public:
     // Function for reacting to the clock signal
     void OnClockSignal() {
         PerformFunction();
-        (*outputLatch).setValue(outputVal);
+        outputLatches[0]->setValue(outputVal);
     }
 
     // Function for reacting to control signals
@@ -191,25 +187,17 @@ public:
         shiftDirection = signal;
     }
 
-    // Function for connecting the output latches
-    void connectOutputLatches(Port* latch) {
-        outputLatch = latch;
-    }
 
-    // Function for connecting input ports
-    void ConnectInputPorts(int id, Port* port) {
-        inputPorts[id] = port;
-    }
+public:
+    Port* inputPorts[2];
+    Port* outputLatches[1];
 
 private:
     double area;
     double power;
     double numCycles;
     int shiftDirection; // 0 -> right shift, 1 -> left shift
-    Port* inputPorts[2];
-    Port* outputLatch; // the latch is defined with port class because it serves the same functionality
     long long outputVal;
-
 };
 
 /**
@@ -221,6 +209,9 @@ public:
         this->area = 2000;
         this->power = 1.5;
         this->numCycles = 3;
+        inputPorts[0] = new Port();
+        inputPorts[1] = new Port();
+        outputLatches[0] = new Port();
     }
 
     // Function for performing the device's main function
@@ -233,33 +224,19 @@ public:
     // Function for reacting to the clock signal
     void OnClockSignal() {
         PerformFunction();
-        (*outputLatch).setValue(outputVal);
+        outputLatches[0]->setValue(outputVal);
     }
 
 
-    // Function for reacting to control signals
-    void OnControlSignal() {
-        return;
-    }
-
-    // Function for connecting the output latches
-    void connectOutputLatches(Port* latch) {
-        outputLatch = latch;
-    }
-
-    // Function for connecting input ports
-    void ConnectInputPorts(int id, Port* port) {
-        inputPorts[id] = port;
-    }
+public:
+    Port* inputPorts[2];
+    Port* outputLatches[1];
 
 private:
     double area;
     double power;
     double numCycles;
-    Port* inputPorts[2];
-    Port* outputLatch; // the latch is defined with port class because it serves the same functionality
     long long outputVal;
-
 };
 
 /**
@@ -271,6 +248,9 @@ public:
         this->area = 5000;
         this->power = 1;
         this->numCycles = 8;
+        inputPorts[0] = new Port();
+        inputPorts[1] = new Port();
+        outputLatches[0] = new Port();
     }
 
     // Function for performing the device's main function
@@ -283,33 +263,18 @@ public:
     // Function for reacting to the clock signal
     void OnClockSignal() {
         PerformFunction();
-        (*outputLatch).setValue(outputVal);
+        outputLatches[0]->setValue(outputVal);
     }
 
-
-    // Function for reacting to control signals
-    void OnControlSignal() {
-        return;
-    }
-
-    // Function for connecting the output latches
-    void connectOutputLatches(Port* latch) {
-        outputLatch = latch;
-    }
-
-    // Function for connecting input ports
-    void ConnectInputPorts(int id, Port* port) {
-        inputPorts[id] = port;
-    }
+public:
+    Port* inputPorts[2];
+    Port* outputLatches[1];
 
 private:
     double area;
     double power;
     double numCycles;
-    Port* inputPorts[2];
-    Port* outputLatch; // the latch is defined with port class because it serves the same functionality
     long long outputVal;
-
 };
 
 
@@ -322,6 +287,9 @@ public:
         this->area = 600;
         this->power = 0.75;
         this->numCycles = 1;
+        inputPorts[0] = new Port();
+        inputPorts[1] = new Port();
+        outputLatches[0] = new Port();
     }
 
     // Function for performing the device's main function
@@ -348,7 +316,7 @@ public:
     // Function for reacting to the clock signal
     void OnClockSignal() {
         PerformFunction();
-        (*outputLatch).setValue(outputVal);
+        outputLatches[1]->setValue(outputVal);
     }
 
     // Function for reacting to control signals
@@ -356,23 +324,16 @@ public:
         logicalFunction = signal;
     }
 
-    // Function for connecting the output latches
-    void connectOutputLatches(Port* latch) {
-        outputLatch = latch;
-    }
 
-    // Function for connecting input ports
-    void ConnectInputPorts(int id, Port* port) {
-        inputPorts[id] = port;
-    }
+public:
+    Port* inputPorts[2];
+    Port* outputLatches[1];
 
 private:
     double area;
     double power;
     double numCycles;
     int logicalFunction; // 0 -> NOT, 1 -> AND, 2 -> OR, 3 -> XOR
-    Port* inputPorts[2];
-    Port* outputLatch; // the latch is defined with port class because it serves the same functionality
     long long outputVal;
 
 };
@@ -387,6 +348,9 @@ public:
         this->area = 400;
         this->power = 0.5;
         this->numCycles = 1;
+        inputPorts[0] = new Port();
+        inputPorts[1] = new Port();
+        outputLatches[0] = new Port();
     }
 
     // Function for performing the device's main function
@@ -397,32 +361,19 @@ public:
     // Function for reacting to the clock signal
     void OnClockSignal() {
         PerformFunction();
-        (*outputLatch).setValue(outputVal);
+        outputLatches[1]->setValue(outputVal);
     }
 
-    // Function for reacting to control signals
-    void OnControlSignal() {
-        return;
-    }
 
-    // Function for connecting the output latches
-    void connectOutputLatches(Port* latch) {
-        outputLatch = latch;
-    }
-
-    // Function for connecting input ports
-    void ConnectInputPorts(int id, Port* port) {
-        inputPorts[id] = port;
-    }
+public:
+    Port* inputPorts[2];
+    Port* outputLatches[1];
 
 private:
     double area;
     double power;
     double numCycles;
-    Port* inputPorts[2];
-    Port* outputLatch; // the latch is defined with port class because it serves the same functionality
     long long outputVal;
-
 };
 
 
@@ -435,6 +386,8 @@ public:
         this->area = 200;
         this->power = 0.25;
         this->numCycles = 1;
+        inputPorts[0] = new Port();
+        outputLatches[0] = new Port();
     }
 
     // Function for performing the device's main function
@@ -449,32 +402,19 @@ public:
     // Function for reacting to the clock signal
     void OnClockSignal() {
         PerformFunction();
-        (*outputLatch).setValue(outputVal);
+        outputLatches[0]->setValue(outputVal);
     }
 
-    // Function for reacting to control signals
-    void OnControlSignal() {
-        return;
-    }
 
-    // Function for connecting the output latches
-    void connectOutputLatches(Port* latch) {
-        outputLatch = latch;
-    }
-
-    // Function for connecting input ports
-    void ConnectInputPorts(int id, Port* port) {
-        inputPorts[id] = port;
-    }
+public:
+    Port* inputPorts[1];
+    Port* outputLatches[1];
 
 private:
     double area;
     double power;
     double numCycles;
-    Port* inputPorts[1];
-    Port* outputLatch; // the latch is defined with port class because it serves the same functionality
     long long outputVal;
-
 };
 
 
@@ -487,6 +427,11 @@ public:
         this->area = 500;
         this->power = 0.25;
         this->numCycles = 0.5;
+        inputPorts[0] = new Port();
+        inputPorts[1] = new Port();
+        inputPorts[2] = new Port();
+        inputPorts[3] = new Port();
+        outputLatches[0] = new Port();
     }
 
     // Function for performing the device's main function
@@ -495,7 +440,7 @@ public:
 
     // Function for reacting to the clock signal
     void OnClockSignal() {
-        outputLatch->setValue(outputVal);
+        outputLatches[0]->setValue(outputVal);
     }
 
     // Function for reacting to control signals
@@ -528,14 +473,15 @@ public:
         inputPorts[id] = port;
     }
 
+public:
+    Port* inputPorts[4];
+    Port* outputLatches[1];
+
 private:
     double area;
     double power;
     double numCycles;
-    Port* inputPorts[4];
-    Port* outputLatch; // the latch is defined with port class because it serves the same functionality
     long long outputVal;
-
 };
 
 /**
@@ -547,6 +493,11 @@ public:
         this->area = 500;
         this->power = 0.25;
         this->numCycles = 0.5;
+        inputPorts[0] = new Port();
+        outputLatches[0] = new Port();
+        outputLatches[1] = new Port();
+        outputLatches[2] = new Port();
+        outputLatches[3] = new Port();
     }
 
     // Function for performing the device's main function
@@ -588,14 +539,15 @@ public:
         inputPort = port;
     }
 
-    private:
+public:
+    Port* inputPorts[1];
+    Port* outputLatches[4]; 
+
+private:
     double area;
     double power;
     double numCycles;
-    Port* inputPort;
-    Port* outputLatch[4]; // the latch is defined with port class because it serves the same functionality
     long long outputVal;
-
 };
 
 
@@ -608,6 +560,8 @@ public:
         this->area = 100;
         this->power = 0.1;
         this->numCycles = 1;
+        inputPorts[0] = new Port();
+        outputLatches[0] = new Port();
     }
 
     // Function for performing the device's main function
@@ -619,7 +573,7 @@ public:
     // Function for reacting to the clock signal
     void OnClockSignal() {
         PerformFunction();
-        outputLatch->setValue(outputVal);
+        outputLatches[0]->setValue(outputVal);
     }
 
     // Function for reacting to control signals
@@ -637,14 +591,15 @@ public:
         inputPorts[id] = port;
     }
 
+public:
+    Port* inputPorts[1];
+    Port* outputLatches[1];
+
 private:
     double area;
     double power;
     double numCycles;
-    Port* inputPorts[1];
-    Port* outputLatch; // the latch is defined with port class because it serves the same functionality
     int outputVal;
-
 };
 
 
@@ -759,10 +714,9 @@ private:
     double area;
     double power;
     double numCycles;
-    Port* inputPorts[1];
-    Port* outputLatch; // the latch is defined with port class because it serves the same functionality
+    Port* inputPorts[4];
+    Port* outputLatches[1];
     long long outputVal;
-
 };
 
 
@@ -812,7 +766,6 @@ private:
     long long value;
     Port* inputPort;
     Port* outputLatch;
-
 };
 
 
@@ -830,14 +783,12 @@ public:
         }
         inputPorts[0] = new Port();
         inputPorts[1] = new Port();
+        outputLatches[0] = new Port();
+        outputLatches[1] = new Port();
     }
 
     // Function for performing the device's main function
     void PerformFunction() {
-    }
-
-    // Function for reacting to the clock signal
-    void OnClockSignal() {
     }
 
     // Function for reacting to control signals
@@ -868,17 +819,8 @@ public:
         }
     }
 
+    // Function for reacting to the clock signal
     void OnClockSignal(int signal) {
-        switch (signal) {
-            case 0:
-                break;
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-        }
     }
 
     // Function for connecting the output latches
@@ -904,6 +846,7 @@ private:
 
 };
 
+
 /**
  * Multi Ported Register File
  */
@@ -920,10 +863,6 @@ public:
 
     // Function for performing the device's main function
     void PerformFunction() {
-    }
-
-    // Function for reacting to the clock signal
-    void OnClockSignal() {
     }
 
     // Function for reacting to control signals
@@ -1001,6 +940,8 @@ public:
                 registers[address1].OnControlSignal(1);
         }
     }
+
+    // Function for reacting to the clock signal
     void OnClockSignal(int signal) {
         switch (signal) {
             case 0:
@@ -1018,25 +959,22 @@ public:
     void connectOutputLatches(int id, Port* latch) {
         outputLatches[id] = latch;
     }
+
     // Function for connecting input ports
     void ConnectInputPorts(int id, Port* port) {
         inputPorts[id] = port;
     }
+
+
+public:
+    Port* inputPorts[4];
+    Port* outputLatches[4];
 
 private:
     double area;
     double power;
     double numCycles;
     std::vector<Register> registers;
-    long long value;
-    int* port;
-    Port* inputPorts[4];
-    Port* outputLatches[4];
-    int* outputLatch;
-    int* outputLatch2;
-    long long value1;
-    long long value2;
-
 };
 
 
