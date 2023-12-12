@@ -444,8 +444,10 @@ public:
     void PerformFunction() {
 
         outputVal = inputPorts[0]->getValue(); // this would only work if this was in bits
-        std::bitset<32> binaryRepresentation(outputVal);
-        outputVal = (~outputVal) + 1;
+        std::bitset<64> binaryRepresentation(outputVal);
+        binaryRepresentation = ~binaryRepresentation;
+        binaryRepresentation += 1;
+        outputVal = binaryRepresentation.to_ullong();
     }
 
     // Function for reacting to the clock signal
