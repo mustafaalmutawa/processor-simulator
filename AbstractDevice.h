@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 #ifndef ABSTRACT_DEVICE_H
 #define ABSTRACT_DEVICE_H
 
@@ -16,22 +15,3 @@ public:
 
 
 #endif // ABSTRACT_DEVICE_H
-=======
-#ifndef ABSTRACT_DEVICE_H
-#define ABSTRACT_DEVICE_H
-
-class Device {
-public:
-    // Constructors
-    // Device() {}
-
-    // Pure Virtual Function for performing the device's main function
-    virtual void PerformFunction() = 0;
-
-    // Pure Virtual Function for reacting to the clock signal
-    virtual void OnClockSignal() = 0;
-};
-
-
-#endif // ABSTRACT_DEVICE_H
->>>>>>> Stashed changes
