@@ -1068,6 +1068,8 @@ public:
         Instruction0x0(3, 1, 2);
     }
 
+
+    // instruction 0x0
     void Instruction0x0(int register_d, int register_s, int register_t) {
         // set the input ports for the register file
         registerFile.inputPorts[0]->setValue(register_s);
@@ -1081,8 +1083,7 @@ public:
         addr.inputPorts[1] = registerFile.outputLatches[1];
 
         // connect addr output latch to register file 1st input port
-        addr.outputLatches[0] = registerFile.inputPorts[0];
-
+        registerFile.inputPorts[0] = addr.outputLatches[0];
         // set value for register file 2nd input port
         registerFile.inputPorts[1]->setValue(register_d);
 
