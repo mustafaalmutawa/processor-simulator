@@ -5,6 +5,10 @@
 #include "AbstractDevice.h"
 
 long long PC = 0;
+int HALT = 0;
+int TOTAL_CYCLES = 0;
+int MULT_CYCLES = 0;
+int DIV_CYCLES = 0;
 
 
 struct Instruction {
@@ -1481,6 +1485,37 @@ public:
 
         // send clock signal for write
         registerFile.OnControlSignal(3);
+    }
+
+    // instruction 0x14 brgt rd, rs,, rt
+    void Instruction0x14(int register_d, int register_s, int register_t) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_s);
+        registerFile.inputPorts[1]->setValue(register_t);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(2);
+
+        if (registerFile.outputLatches[0] <= registerFile.outputLatches[1]) {
+            PC += 4;
+
+        } else {
+
+            // set value for register file 2nd input port
+            registerFile.inputPorts[1]->setValue(register_d);
+
+
+        }
+
+
+        // send clock signal for write
+        registerFile.OnControlSignal(3);
+    }
+
+     // instruction 0x1f Halt
+    void Instruction0x1f() {
+        HALT = 1;
+
     }
 
 
