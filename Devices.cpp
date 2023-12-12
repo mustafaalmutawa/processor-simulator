@@ -736,6 +736,54 @@ private:
 
 };
 
+/**
+ * Add4 Device
+ */
+class Add4 : public Device {
+public:
+    Add4() {
+        this->area = 100;
+        this->power = 0.1;
+        this->numCycles = 1;
+    }
+
+    // Function for performing the device's main function
+    void PerformFunction() {
+        std::cout << "port1 value: " << inputPorts[0]->getValue() << std::endl;
+        outputVal = inputPorts[0]->getValue() + 4;
+    }
+
+    // Function for reacting to the clock signal
+    void OnClockSignal() {
+        PerformFunction();
+        (*outputLatch).setValue(outputVal);
+    }
+
+    // Function for reacting to control signals
+    void OnControlSignal() {
+        return;
+    }
+
+    // Function for connecting the output latches
+    void connectOutputLatches(Port* latch) {
+        outputLatch = latch;
+    }
+
+    // Function for connecting input ports
+    void ConnectInputPorts(int id, Port* port) {
+        inputPorts[id] = port;
+    }
+
+private:
+    double area;
+    double power;
+    double numCycles;
+    Port* inputPorts[1];
+    Port* outputLatch; // the latch is defined with port class because it serves the same functionality
+    int outputVal;
+
+};
+
 
 
 class Processor {
