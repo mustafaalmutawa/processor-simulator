@@ -19,84 +19,21 @@ struct Instruction {
     uint32_t literal;
 };
 
-Instruction decodeInstruction(uint32_t instruction) {
-    Instruction result;
+void InstructionFetch() {
+    std::string binaryString = "10111010100111001100000100011000";
+    std::bitset<32> bits(binaryString);
+    uint32_t instruction = static_cast<uint32_t>(bits.to_ulong());
 
+    std::cout << "The instruction is: " << instruction << std::endl;
+
+    Instruction result;
     result.opcode = (instruction >> 27) & 0x1F;  // Extracting the 5-bit opcode
     result.reg1 = (instruction >> 22) & 0x1F;    // Extracting the first register specifier
     result.reg2 = (instruction >> 17) & 0x1F;    // Extracting the second register specifier
     result.reg3 = (instruction >> 12) & 0x1F;    // Extracting the third register specifier
     result.literal = instruction & 0xFFF;        // Extracting the 12-bit literal
 
-    switch(result.opcode){
-        case 0b00000:
-            // set control signals and pass function for "add r1 r2 r3"
-
-            break;
-        case 0b00001:
-            // set control signals and pass function for "addi r1 L"
-        case 0b00010:
-            // set control signals and pass function for "sub r1 r2 r3"
-        case 0b00011:
-            // set control signals and pass function for "subi r1 L"
-        case 0b00100:
-            // set control signals and pass function for "mul r1 r2 r3"
-        case 0b00101:
-            // set control signals and pass function for "div r1 r2 r3"
-        case 0b00110:
-            // set control signals and pass function for "and r1 r2 r3"
-        case 0b00111:
-            // set control signals and pass function for "or r1 r2 r3"
-        case 0b01000:
-            // set control signals and pass function for "xor r1 r2 r3"
-        case 0b01001:
-            // set control signals and pass function for "not r1 r2" r1=~r3
-        case 0b01010:
-            // set control signals and pass function for "shftr r1 r2 r3" r1=r2>>r3
-        case 0b01011:
-            // set control signals and pass function for "shftri r1 L"
-        case 0b01100:
-            // set control signals and pass function for "shftl r1 r2 r3"
-        case 0b01101:
-            // set control signals and pass function for "shftli r1 L"
-        case 0b01110:
-            // set control signals and pass function for "br r1" PC=r1
-        case 0b01111:
-            // set control signals and pass function for "brr r1" PC = PC + 1
-        case 0b10000:
-            // set control signals and pass function for "brr L" PC = PC + L
-        case 0b10001:
-            // set control signals and pass function for "brnz r1 r2" PC = (r2==0)? PC+4 : r1
-        case 0b10010:
-            // set control signals and pass function for "call r1" mem[r31-8]= PC+4 also PC= r1
-        case 0b10011:
-            // set control signals and pass function for "return" PC= mem[r31-8]
-        case 0b10100:
-            // set control signals and pass function for "halt"
-        case 0b10101:
-            // set control signals and pass function for "mov r1  r2(L)" r1=mem[r2+L]
-        case 0b10110:
-            // set control signals and pass function for "mov r1 r2" r1=r2
-        case 0b10111:
-            // set control signals and pass function for "mov r1 L" r1[52:63] = L
-        case 0b11000:
-            // set control signals and pass function for "mov r1(L) r2" mem[r1+l] = r2
-        case 0b11001:
-            // set control signals and pass function for "addf r1 r2 r3"
-        case 0b11010:
-            // set control signals and pass function for "subf r1 r2 r3"
-        case 0b11011:
-            // set control signals and pass function for "mulf r1 r2 r3"
-        case 0b11100:
-            // set control signals and pass function for "divf r1 r2 r3"
-        case 0b11101:
-            // set control signals and pass function for "input r1 r2" r1=input[r2]
-        case 0b11110:
-            // set control signals and pass function for "out r1 r2" output[r1]=r2
-            break;
-    }
-
-    return result;
+    
 }
 
 /**
@@ -582,145 +519,6 @@ private:
 
 
 /**
- * Control Array Device
- */
-class ControlArray : public Device {
-public:
-    ControlArray() {
-        this->area = 500;
-        this->power = 0.25;
-        this->numCycles = 0.5;
-        inputPorts[0] = new Port();
-        outputLatches[0] = new Port();
-    }
-
-    // Function for performing the device's main function
-    void PerformFunction() {
-        Instruction result;
-        uint32_t instruction = inputPorts[0]->getValue();
-
-        result.opcode = (instruction >> 27) & 0x1F;  // Extracting the 5-bit opcode
-        result.reg1 = (instruction >> 22) & 0x1F;    // Extracting the first register specifier
-        result.reg2 = (instruction >> 17) & 0x1F;    // Extracting the second register specifier
-        result.reg3 = (instruction >> 12) & 0x1F;    // Extracting the third register specifier
-        result.literal = instruction & 0xFFF;        // Extracting the 12-bit literal
-
-        switch(result.opcode){
-            case 0b00000:
-                // set control signals and pass function for "add r1 r2 r3"
-                break;
-            case 0b00001:
-                // set control signals and pass function for "addi r1 L"
-                break;
-            case 0b00010:
-                // set control signals and pass function for "sub r1 r2 r3"
-                break;
-            case 0b00011:
-                // set control signals and pass function for "subi r1 L"
-                break;
-            case 0b00100:
-                // set control signals and pass function for "mul r1 r2 r3"
-                break;
-            case 0b00101:
-                // set control signals and pass function for "div r1 r2 r3"
-                break;
-            case 0b00110:
-                // set control signals and pass function for "and r1 r2 r3"
-                break;
-            case 0b00111:
-                // set control signals and pass function for "or r1 r2 r3"
-                break;
-            case 0b01000:
-                // set control signals and pass function for "xor r1 r2 r3"
-                break;
-            case 0b01001:
-                // set control signals and pass function for "not r1 r2" r1=~r3
-                break;
-            case 0b01010:
-                // set control signals and pass function for "shftr r1 r2 r3" r1=r2>>r3
-                break;
-            case 0b01011:
-                // set control signals and pass function for "shftri r1 L"
-                break;
-            case 0b01100:
-                // set control signals and pass function for "shftl r1 r2 r3"
-                break;
-            case 0b01101:
-                // set control signals and pass function for "shftli r1 L"
-                break;
-            case 0b01110:
-                // set control signals and pass function for "br r1" PC=r1
-                break;
-            case 0b01111:
-                // set control signals and pass function for "brr r1" PC = PC + 1
-                break;
-            case 0b10000:
-                // set control signals and pass function for "brr L" PC = PC + L
-                break;
-            case 0b10001:
-                // set control signals and pass function for "brnz r1 r2" PC = (r2==0)? PC+4 : r1
-                break;
-            case 0b10010:
-                // set control signals and pass function for "call r1" mem[r31-8]= PC+4 also PC= r1
-                break;
-            case 0b10011:
-                // set control signals and pass function for "return" PC= mem[r31-8]
-                break;
-            case 0b10100:
-                // set control signals and pass function for "halt"
-                break;
-            case 0b10101:
-                // set control signals and pass function for "mov r1  r2(L)" r1=mem[r2+L]
-                break;
-            case 0b10110:
-                // set control signals and pass function for "mov r1 r2" r1=r2
-                break;
-            case 0b10111:
-                // set control signals and pass function for "mov r1 L" r1[52:63] = L
-                break;
-            case 0b11000:
-                // set control signals and pass function for "mov r1(L) r2" mem[r1+l] = r2
-                break;
-            case 0b11001:
-                // set control signals and pass function for "addf r1 r2 r3"
-                break;
-            case 0b11010:
-                // set control signals and pass function for "subf r1 r2 r3"
-                break;
-            case 0b11011:
-                // set control signals and pass function for "mulf r1 r2 r3"
-                break;
-            case 0b11100:
-                // set control signals and pass function for "divf r1 r2 r3"
-                break;
-            case 0b11101:
-                // set control signals and pass function for "input r1 r2" r1=input[r2]
-                break;
-            case 0b11110:
-                // set control signals and pass function for "out r1 r2" output[r1]=r2
-                break;
-        }
-    }
-
-    // Function for reacting to the clock signal
-    void OnClockSignal() {
-        PerformFunction();
-    }
-
-
-public:
-    Port* inputPorts[1];
-    Port* outputLatches[1];
-
-private:
-    double area;
-    double power;
-    double numCycles;
-    long long outputVal;
-};
-
-
-/**
  * Register Device
  */
 class Register : public Device {
@@ -971,33 +769,33 @@ private:
 };
 
 
-class Processor {
+class InstructionExecute  {
 public:
-    Processor() {
+    InstructionExecute() {
     }
 
-    void setRegisters() {
-        // write value 4 in the register 1
-        registerFile.inputPorts[0]->setValue(4);
-        registerFile.inputPorts[1]->setValue(1);
-        registerFile.OnControlSignal(3);
+    // void setRegisters() {
+    //     // write value 4 in the register 1
+    //     registerFile.inputPorts[0]->setValue(4);
+    //     registerFile.inputPorts[1]->setValue(1);
+    //     registerFile.OnControlSignal(3);
 
-        // write value 3 in the register 2
-        registerFile.inputPorts[0]->setValue(3);
-        registerFile.inputPorts[1]->setValue(2);
-        registerFile.OnControlSignal(3);
+    //     // write value 3 in the register 2
+    //     registerFile.inputPorts[0]->setValue(3);
+    //     registerFile.inputPorts[1]->setValue(2);
+    //     registerFile.OnControlSignal(3);
 
-        // read values at register 1 and 2
-        registerFile.inputPorts[0]->setValue(1);
-        registerFile.inputPorts[1]->setValue(2);
-        registerFile.connectOutputLatches(0, &latch1);
-        registerFile.connectOutputLatches(1, &latch2);
-        registerFile.OnControlSignal(2);
+    //     // read values at register 1 and 2
+    //     registerFile.inputPorts[0]->setValue(1);
+    //     registerFile.inputPorts[1]->setValue(2);
+    //     registerFile.connectOutputLatches(0, &latch1);
+    //     registerFile.connectOutputLatches(1, &latch2);
+    //     registerFile.OnControlSignal(2);
 
-        std::cout << "registr value: " << latch1.getValue() << std::endl;
-        std::cout << "registr value: " << latch2.getValue() << std::endl;
-        Instruction0x0(3, 1, 2);
-    }
+    //     std::cout << "registr value: " << latch1.getValue() << std::endl;
+    //     std::cout << "registr value: " << latch2.getValue() << std::endl;
+    //     Instruction0x0(3, 1, 2);
+    // }
 
 
     // instruction 0x0
@@ -1026,11 +824,11 @@ public:
     }
 
     // instruction 0x1
-    void Instruction0x1(int register_d, int register_s, int immediate) {
+    void Instruction0x1(int register_d, int immediate) {
         // set the input ports for the register file
-        registerFile.inputPorts[0]->setValue(register_s);
+        registerFile.inputPorts[0]->setValue(register_d);
 
-        // send clock signal to read registers
+        // send clock signal to read register
         registerFile.OnControlSignal(1);
 
         // connect register file output latches to adder input ports
@@ -1077,9 +875,9 @@ public:
 
 
     // instruction 0x3
-    void Instruction0x3(int register_d, int register_s, int immediate) {
+    void Instruction0x3(int register_d, int immediate) {
         // set the input ports for the register file
-        registerFile.inputPorts[0]->setValue(register_s);
+        registerFile.inputPorts[0]->setValue(register_d);
 
         // send clock signal to read registers
         registerFile.OnControlSignal(1);
@@ -1285,9 +1083,9 @@ public:
 
 
     // instruction 0xb shiftri
-    void Instruction0xb(int register_d, int register_s, int immediate) {
+    void Instruction0xb(int register_d, int immediate) {
         // set the input ports for the register file
-        registerFile.inputPorts[0]->setValue(register_s);
+        registerFile.inputPorts[0]->setValue(register_d);
 
         // send clock signal to read registers
         registerFile.OnControlSignal(1);
@@ -1338,9 +1136,9 @@ public:
 
 
     // instruction 0xd shiftri
-    void Instruction0xd(int register_d, int register_s, int immediate) {
+    void Instruction0xd(int register_d, int immediate) {
         // set the input ports for the register file
-        registerFile.inputPorts[0]->setValue(register_s);
+        registerFile.inputPorts[0]->setValue(register_d);
 
         // send clock signal to read registers
         registerFile.OnControlSignal(1);
@@ -1358,6 +1156,82 @@ public:
         shifter.OnControlSignal(1);
         shifter.OnClockSignal();
 
+        // send clock signal for write
+        registerFile.OnControlSignal(3);
+    }
+
+
+    // instruction 0x0e br rd
+    void Instruction0x0e(int register_d) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_d);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(1);
+        // need to initialise PC
+        // connect addr output latch to register file 1st input port
+        PC = registerFile.outputLatches[0]->getValue();
+
+    }
+
+    // instruction 0x0f brr rd
+    void Instruction0x0f(int register_d) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_d);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(1);
+
+
+
+        // need to initialise PC
+        // connect addr output latch to register file 1st input port
+        PC += registerFile.outputLatches[0]->getValue();
+
+    }
+
+    // instruction 0x10 brr L
+    void Instruction0x10(int immediate) {
+        PC += immediate;
+    }
+
+    // instruction 0x11 brnz rd, rs
+    void Instruction0x11(int register_d, int register_s) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_s);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(1);
+
+        if (registerFile.outputLatches[0] == 0) {
+            PC += 4;
+
+        } else {
+
+            // set value for register file 2nd input port
+            registerFile.inputPorts[1]->setValue(register_d);
+        }
+        // send clock signal for write
+        registerFile.OnControlSignal(3);
+    }
+
+    // instruction 0x14 brgt rd, rs,, rt
+    void Instruction0x14(int register_d, int register_s, int register_t) {
+        // set the input ports for the register file
+        registerFile.inputPorts[0]->setValue(register_s);
+        registerFile.inputPorts[1]->setValue(register_t);
+
+        // send clock signal to read registers
+        registerFile.OnControlSignal(2);
+
+        if (registerFile.outputLatches[0] <= registerFile.outputLatches[1]) {
+            PC += 4;
+
+        } else {
+
+            // set value for register file 2nd input port
+            registerFile.inputPorts[1]->setValue(register_d);
+        }
         // send clock signal for write
         registerFile.OnControlSignal(3);
     }
@@ -1425,110 +1299,188 @@ public:
         registerFile.OnControlSignal(3);
     }
 
-
-    // instruction 0x0e br rd
-    void Instruction0x0e(int register_d) {
-        // set the input ports for the register file
-        registerFile.inputPorts[0]->setValue(register_d);
-
-        // send clock signal to read registers
-        registerFile.OnControlSignal(1);
-
-
-
-        // need to initialise PC
-        // connect addr output latch to register file 1st input port
-        PC = registerFile.outputLatches[0]->getValue();
-
-    }
-
-    // instruction 0x0f brr rd
-    void Instruction0x0f(int register_d) {
-        // set the input ports for the register file
-        registerFile.inputPorts[0]->setValue(register_d);
-
-        // send clock signal to read registers
-        registerFile.OnControlSignal(1);
-
-
-
-        // need to initialise PC
-        // connect addr output latch to register file 1st input port
-        PC += registerFile.outputLatches[0]->getValue();
-
-    }
-
-    // instruction 0x10 brr L
-    void Instruction0x10(int immediate) {
-        PC += immediate;
-    }
-
-    // instruction 0x11 brnz rd, rs
-    void Instruction0x11(int register_d, int register_s) {
-        // set the input ports for the register file
-        registerFile.inputPorts[0]->setValue(register_s);
-
-        // send clock signal to read registers
-        registerFile.OnControlSignal(1);
-
-        if (registerFile.outputLatches[0] == 0) {
-            PC += 4;
-
-        } else {
-
-            // set value for register file 2nd input port
-            registerFile.inputPorts[1]->setValue(register_d);
-
-
-        }
-
-
-        // send clock signal for write
-        registerFile.OnControlSignal(3);
-    }
-
-    // instruction 0x14 brgt rd, rs,, rt
-    void Instruction0x14(int register_d, int register_s, int register_t) {
-        // set the input ports for the register file
-        registerFile.inputPorts[0]->setValue(register_s);
-        registerFile.inputPorts[1]->setValue(register_t);
-
-        // send clock signal to read registers
-        registerFile.OnControlSignal(2);
-
-        if (registerFile.outputLatches[0] <= registerFile.outputLatches[1]) {
-            PC += 4;
-
-        } else {
-
-            // set value for register file 2nd input port
-            registerFile.inputPorts[1]->setValue(register_d);
-
-
-        }
-
-
-        // send clock signal for write
-        registerFile.OnControlSignal(3);
-    }
-
-     // instruction 0x1f Halt
+    // instruction 0x1f Halt
     void Instruction0x1f() {
         HALT = 1;
-
     }
 
 
 private:
     RegisterFile registerFile;
-    Port latch1;
-    Port latch2;
     Addr addr;
     Multiplier multiplier;
     Divider divider;
     Shifter shifter;
     Logic logic;
 
+};
+
+
+/**
+ * Control Array Device
+ */
+class ControlArray : public Device {
+public:
+    ControlArray() {
+        this->area = 500;
+        this->power = 0.25;
+        this->numCycles = 0.5;
+        inputPorts[0] = new Port();
+        outputLatches[0] = new Port();
+    }
+
+    // Function for performing the device's main function
+    void PerformFunction() {
+        Instruction result;
+        uint32_t instruction = inputPorts[0]->getValue();
+
+        result.opcode = (instruction >> 27) & 0x1F;  // Extracting the 5-bit opcode
+        result.reg1 = (instruction >> 22) & 0x1F;    // Extracting the first register specifier
+        result.reg2 = (instruction >> 17) & 0x1F;    // Extracting the second register specifier
+        result.reg3 = (instruction >> 12) & 0x1F;    // Extracting the third register specifier
+        result.literal = instruction & 0xFFF;        // Extracting the 12-bit literal
+
+        switch(result.opcode){
+            case 0b00000:
+                // set control signals and pass function for "add r1 r2 r3"
+                execute.Instruction0x0(result.reg1, result.reg2, result.reg3);
+                break;
+            case 0b00001:
+                // set control signals and pass function for "addi r1 L"
+                execute.Instruction0x1(result.reg1, result.literal);
+                break;
+            case 0b00010:
+                // set control signals and pass function for "sub r1 r2 r3"
+                execute.Instruction0x2(result.reg1, result.reg2, result.reg3);
+                break;
+            case 0b00011:
+                // set control signals and pass function for "subi r1 L"
+                execute.Instruction0x3(result.reg1, result.literal);
+                break;
+            case 0b00100:
+                // set control signals and pass function for "mul r1 r2 r3"
+                execute.Instruction0x4(result.reg1, result.reg2, result.reg3);
+                break;
+            case 0b00101:
+                // set control signals and pass function for "div r1 r2 r3"
+                execute.Instruction0x5(result.reg1, result.reg2, result.reg3);
+                break;
+            case 0b00110:
+                // set control signals and pass function for "and r1 r2 r3"
+                execute.Instruction0x6(result.reg1, result.reg2, result.reg3);
+                break;
+            case 0b00111:
+                // set control signals and pass function for "or r1 r2 r3"
+                execute.Instruction0x7(result.reg1, result.reg2, result.reg3);
+                break;
+            case 0b01000:
+                // set control signals and pass function for "xor r1 r2 r3"
+                execute.Instruction0x8(result.reg1, result.reg2, result.reg3);
+                break;
+            case 0b01001:
+                // set control signals and pass function for "not r1 r2" r1=~r3
+                execute.Instruction0x9(result.reg1, result.reg2, result.reg3);
+                break;
+            case 0b01010:
+                // set control signals and pass function for "shftr r1 r2 r3" r1=r2>>r3
+                execute.Instruction0xa(result.reg1, result.reg2, result.reg3);
+                break;
+            case 0b01011:
+                // set control signals and pass function for "shftri r1 L"
+                execute.Instruction0xb(result.reg1, result.literal);
+                break;
+            case 0b01100:
+                // set control signals and pass function for "shftl r1 r2 r3"
+                execute.Instruction0xc(result.reg1, result.reg2, result.reg3);
+                break;
+            case 0b01101:
+                // set control signals and pass function for "shftli r1 L"
+                execute.Instruction0xd(result.reg1, result.literal);
+                break;
+            case 0b01110:
+                // set control signals and pass function for "br r1" PC=r1
+                execute.Instruction0x0e(result.reg1);
+                break;
+            case 0b01111:
+                // set control signals and pass function for "brr r1" PC = PC + 1
+                execute.Instruction0x0f(result.reg1);
+                break;
+            case 0b10000:
+                // set control signals and pass function for "brr L" PC = PC + L
+                execute.Instruction0x10(result.literal);
+                break;
+            case 0b10001:
+                // set control signals and pass function for "brnz r1 r2" PC = (r2==0)? PC+4 : r1
+                execute.Instruction0x11(result.reg1, result.reg2);
+                break;
+            case 0b10010:
+                // set control signals and pass function for "call r1" mem[r31-8]= PC+4 also PC= r1
+                break;
+            case 0b10011:
+                // set control signals and pass function for "return" PC= mem[r31-8]
+                break;
+            case 0b10100:
+                // set control signals and pass function for "brgt"
+                execute.Instruction0x14(result.reg1, result.reg2, result.reg3);
+                break;
+            case 0b11111:
+                // set control signals and pass function for "halt"
+                execute.Instruction0x1f();
+                break;
+            case 0b10101:
+                // set control signals and pass function for "mov r1  r2(L)" r1=mem[r2+L]
+                break;
+            case 0b10110:
+                // set control signals and pass function for "mov r1 r2" r1=r2
+                execute.Instruction0x16(result.reg1, result.reg2);
+                break;
+            case 0b10111:
+                // set control signals and pass function for "mov r1 L" r1[52:63] = L
+                execute.Instruction0x17(result.reg1, result.reg2, result.literal);
+                break;
+            case 0b11000:
+                // set control signals and pass function for "mov r1(L) r2" mem[r1+l] = r2
+                execute.Instruction0x18(result.reg1, result.reg2, result.reg3);
+                break;
+            case 0b11001:
+                // set control signals and pass function for "addf r1 r2 r3"
+                execute.Instruction0x0(result.reg1, result.reg2, result.reg3);
+                break;
+            case 0b11010:
+                // set control signals and pass function for "subf r1 r2 r3"
+                execute.Instruction0x2(result.reg1, result.reg2, result.reg3);
+                break;
+            case 0b11011:
+                // set control signals and pass function for "mulf r1 r2 r3"
+                break;
+            case 0b11100:
+                // set control signals and pass function for "divf r1 r2 r3"
+                break;
+            case 0b11101:
+                // set control signals and pass function for "input r1 r2" r1=input[r2]
+                break;
+            case 0b11110:
+                // set control signals and pass function for "out r1 r2" output[r1]=r2
+                break;
+        }
+    }
+
+    // Function for reacting to the clock signal
+    void OnClockSignal() {
+        PerformFunction();
+    }
+
+
+public:
+    Port* inputPorts[1];
+    Port* outputLatches[1];
+
+private:
+    InstructionExecute execute;
+    double area;
+    double power;
+    double numCycles;
+    long long outputVal;
 };
 
 
@@ -1595,9 +1547,7 @@ int main() {
     // multiply.OnClockSignal();
     // std::cout << "result: " << latch.getValue() << std::endl;
 
-    std::cout << "Calling function" << std::endl;
-    Processor processor;
-    processor.setRegisters();
+    InstructionFetch();
 
     return 0;
 }
